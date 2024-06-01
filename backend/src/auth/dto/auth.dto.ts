@@ -1,11 +1,29 @@
+import { IsNotEmpty, IsString } from 'class-validator';
+
 export class SignupDto {
+  @IsString()
+  @IsNotEmpty()
   phoneNumber: string;
-  passwordHash: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsString()
+  @IsNotEmpty()
   firstName: string;
+
+  @IsString()
+  @IsNotEmpty()
   lastName: string;
 }
 
 export class LoginDto {
-  username: string;
+  @IsString()
+  @IsNotEmpty()
+  phoneNumber: string;
+
+  @IsString()
+  @IsNotEmpty()
   password: string;
 }
