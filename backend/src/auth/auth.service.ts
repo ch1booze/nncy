@@ -1,11 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { LoginDto, SignupDto } from './dto';
+import { LoginDto, SignupDto, VerifyPhoneNumberDto } from './dto';
 import { PrismaService } from 'src/prisma.service';
 import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
   constructor(private prismaService: PrismaService) {}
+
+  async sendVerificationCode(phoneNumber: string) {
+    return `Send verification code to ${phoneNumber}.`;
+  }
+
+  async verifyPhoneNumber(verifyPhoneNumberDto: VerifyPhoneNumberDto) {
+    const { phoneNumber, verificationCode } = verifyPhoneNumberDto;
+    if (verificationCode === phoneNumber.slice(phoneNumber.length - 4))
+      return 'User has been verified';
+    else return `Invalid verification code.`;
+  }
 
   async signup(signupDto: SignupDto) {
     const { password } = signupDto;
@@ -19,7 +30,10 @@ export class AuthService {
       },
     });
 
-    return signupDto;
+    return this.login({
+      phoneNumber: signupDto.phoneNumber,
+      password: signupDto.password,
+    });
   }
 
   async login(loginDto: LoginDto) {
