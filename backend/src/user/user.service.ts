@@ -8,8 +8,11 @@ import { ResponseDto } from 'src/utils/response.dto';
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async sendVerificationCode(phoneNumber: string) {
-    return `Send verification code to ${phoneNumber}.`;
+  async sendVerificationCode(phoneNumber: string): Promise<ResponseDto<null>> {
+    return {
+      statusCode: HttpStatus.OK,
+      message: `Sent verification code to ${phoneNumber}.`,
+    };
   }
 
   async verifyPhoneNumber(
@@ -17,17 +20,15 @@ export class UserService {
   ): Promise<ResponseDto<null>> {
     const { phoneNumber, verificationCode } = verifyPhoneNumberDto;
     if (verificationCode === phoneNumber.slice(phoneNumber.length - 4)) {
-      const responseDto = {
+      return {
         statusCode: HttpStatus.OK,
         message: 'User has been verified.',
       };
-      return responseDto;
     } else {
-      const responseDto = {
-        statusCode: HttpStatus.OK,
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
         message: `User can't been verified.`,
       };
-      return responseDto;
     }
   }
 
@@ -49,15 +50,30 @@ export class UserService {
     });
   }
 
-  async login(loginDto: LoginDto) {
+  async login(
+    loginDto: LoginDto,
+  ): Promise<ResponseDto<{ loginDto: LoginDto } | null>> {
     const user = await this.prismaService.user.findUnique({
       where: { phoneNumber: loginDto.phoneNumber },
     });
-    if (!user) return 'User does not exist.';
+    if (!user)
+      return {
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: `User does not exist.`,
+      };
 
     const { passwordHash } = user;
     const isMatched = await argon2.verify(passwordHash, loginDto.password);
-    if (isMatched) return loginDto;
-    else return 'Password is incorrect.';
+    if (isMatched)
+      return {
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: `User has been logged in .`,
+        data: { loginDto },
+      };
+    else
+      return {
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: `Password incorrect.`,
+      };
   }
 }
