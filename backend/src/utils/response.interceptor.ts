@@ -6,10 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-export interface ResponseDto<T> {
-  data: T;
-}
+import { ResponseDto } from './response.dto';
 
 @Injectable()
 export class ResponseInterceptor<T>
@@ -19,6 +16,8 @@ export class ResponseInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<ResponseDto<T>> {
-    return next.handle().pipe(map((data) => ({ data })));
+    return next
+      .handle()
+      .pipe(map((responseDto: ResponseDto<T>) => responseDto));
   }
 }

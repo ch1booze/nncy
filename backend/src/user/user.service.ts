@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { LoginDto, SignupDto, VerifyPhoneNumberDto } from './dto';
 import { PrismaService } from 'src/utils/prisma.service';
 import * as argon2 from 'argon2';
+import { ResponseDto } from 'src/utils/response.dto';
 
 @Injectable()
 export class UserService {
@@ -11,11 +12,23 @@ export class UserService {
     return `Send verification code to ${phoneNumber}.`;
   }
 
-  async verifyPhoneNumber(verifyPhoneNumberDto: VerifyPhoneNumberDto) {
+  async verifyPhoneNumber(
+    verifyPhoneNumberDto: VerifyPhoneNumberDto,
+  ): Promise<ResponseDto<null>> {
     const { phoneNumber, verificationCode } = verifyPhoneNumberDto;
-    if (verificationCode === phoneNumber.slice(phoneNumber.length - 4))
-      return 'User has been verified';
-    else return `Invalid verification code.`;
+    if (verificationCode === phoneNumber.slice(phoneNumber.length - 4)) {
+      const responseDto = {
+        statusCode: HttpStatus.OK,
+        message: 'User has been verified.',
+      };
+      return responseDto;
+    } else {
+      const responseDto = {
+        statusCode: HttpStatus.OK,
+        message: `User can't been verified.`,
+      };
+      return responseDto;
+    }
   }
 
   async signup(signupDto: SignupDto) {
