@@ -21,8 +21,8 @@ model User {
   passwordHash String
   firstName    String
   lastName     String
-  bvn          String @unique
 
+  bvn         String?   @unique
   email       String?   @unique
   gender      Gender?
   dataOfBirth DateTime? @db.Date

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { LoginDto, SignupDto, VerifyPhoneNumberDto } from './dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/utils/prisma.service';
 import * as argon2 from 'argon2';
 
 @Injectable()
-export class AuthService {
+export class UserService {
   constructor(private prismaService: PrismaService) {}
 
   async sendVerificationCode(phoneNumber: string) {
