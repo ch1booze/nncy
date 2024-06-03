@@ -7,23 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Gender {
-  Male
-  Female
-}
-
 model User {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  phoneNumber  String @unique
+  id           String    @id @default(uuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  phoneNumber  String    @unique
   passwordHash String
   firstName    String
   lastName     String
+  bvn          String?   @unique
+  dateOfBirth  DateTime? @db.Date
+  email        String?   @unique
+  gender       Gender?
+}
 
-  bvn         String?   @unique
-  email       String?   @unique
-  gender      Gender?
-  dataOfBirth DateTime? @db.Date
+enum Gender {
+  Male
+  Female
 }

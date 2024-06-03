@@ -1,8 +1,14 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { LoginDto, SignupDto, VerifyPhoneNumberDto } from './dto';
+import {
+  LoginDto,
+  SignupDto,
+  UpdateProfileDto,
+  VerifyPhoneNumberDto,
+} from './dto';
 import { PrismaService } from 'src/utils/prisma.service';
 import * as argon2 from 'argon2';
 import { ResponseDto } from 'src/utils/response.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -75,5 +81,41 @@ export class UserService {
         statusCode: HttpStatus.UNAUTHORIZED,
         message: `Password incorrect.`,
       };
+  }
+
+  async getProfile(phoneNumber: string): Promise<ResponseDto<User | null>> {
+    const user = await this.prismaService.user.findUnique({
+      where: { phoneNumber },
+    });
+    if (user)
+      return {
+        statusCode: HttpStatus.OK,
+        message: `The user profile has been gotten.`,
+        data: user,
+      };
+    else
+      return {
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: `User does not exist.`,
+      };
+  }
+
+  async updateProfile(
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<ResponseDto<null>> {
+    await this.prismaService.user.update({
+      where: {
+        phoneNumber: updateProfileDto.phoneNumber,
+      },
+      data: {
+        firstName: updateProfileDto.firstName,
+        lastName: updateProfileDto.lastName,
+      },
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'User updated successfully.',
+    };
   }
 }

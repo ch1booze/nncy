@@ -1,6 +1,6 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Put, Param } from '@nestjs/common';
 import { UserService } from './user.service';
-import { LoginDto, SignupDto } from './dto';
+import { LoginDto, SignupDto, UpdateProfileDto } from './dto';
 
 @Controller('user')
 export class UserController {
@@ -24,5 +24,15 @@ export class UserController {
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     return this.userService.login(loginDto);
+  }
+
+  @Get('get-profile/:phoneNumber')
+  async getProfile(@Param('phoneNumber') phoneNumber: string) {
+    return await this.userService.getProfile(phoneNumber);
+  }
+
+  @Put('update-profile')
+  async updateProfile(@Body() updateProfileDto: UpdateProfileDto) {
+    return this.userService.updateProfile(updateProfileDto);
   }
 }

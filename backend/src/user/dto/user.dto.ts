@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsPhoneNumber, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
 
 export class SignupDto {
   @IsPhoneNumber('NG')
@@ -16,11 +16,6 @@ export class SignupDto {
   @IsString()
   @IsNotEmpty()
   lastName: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Length(11, 11)
-  bvn: string;
 }
 
 export class LoginDto {
@@ -41,4 +36,16 @@ export class VerifyPhoneNumberDto {
   @IsString()
   @IsNotEmpty()
   verificationCode: string;
+}
+
+export class UpdateProfileDto {
+  @IsPhoneNumber('NG')
+  @IsNotEmpty()
+  phoneNumber: string;
+
+  @IsString()
+  firstName?: string;
+
+  @IsString()
+  lastName?: string;
 }
