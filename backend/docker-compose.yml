@@ -1,20 +1,37 @@
 services:
-  db:
+  auth_db:
     image: postgres:latest
     environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/auth_pgdata
+      POSTGRES_USER: ${AUTH_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - db_net
+      - auth_db_net
     restart: unless-stopped
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - auth_db_data:/var/lib/postgresql/data/auth_pgdata
+
+  api_db:
+    image: postgres:latest
+    environment:
+      PGDATA: /var/lib/postgresql/data/api_pgdata
+      POSTGRES_USER: ${API_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${API_POSTGRES_PASSWORD}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - api_db_net
+    restart: unless-stopped
+    volumes:
+      - api_db_data:/var/lib/postgresql/data/api_pgdata
 
   search:
     image: opensearchproject/opensearch:latest
@@ -48,16 +65,16 @@ services:
   fusionauth:
     image: fusionauth/fusionauth-app:latest
     depends_on:
-      db:
+      auth_db:
         condition: service_healthy
       search:
         condition: service_healthy
     environment:
-      DATABASE_URL: jdbc:postgresql://db:5432/fusionauth
-      DATABASE_ROOT_USERNAME: ${POSTGRES_USER}
-      DATABASE_ROOT_PASSWORD: ${POSTGRES_PASSWORD}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_URL: jdbc:postgresql://auth_db:5432/fusionauth
+      DATABASE_ROOT_USERNAME: ${AUTH_POSTGRES_USER}
+      DATABASE_ROOT_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
+      DATABASE_USERNAME: ${AUTH_DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${AUTH_DATABASE_PASSWORD}
       FUSIONAUTH_APP_MEMORY: ${FUSIONAUTH_APP_MEMORY}
       FUSIONAUTH_APP_RUNTIME_MODE: ${FUSIONAUTH_APP_RUNTIME_MODE}
       FUSIONAUTH_APP_URL: http://fusionauth:9011
@@ -65,7 +82,7 @@ services:
       SEARCH_TYPE: elasticsearch
       FUSIONAUTH_APP_KICKSTART_FILE: ${FUSIONAUTH_APP_KICKSTART_FILE}
     networks:
-      - db_net
+      - auth_db_net
       - search_net
     restart: unless-stopped
     ports:
@@ -75,12 +92,15 @@ services:
       - ./kickstart:/usr/local/fusionauth/kickstart
 
 networks:
-  db_net:
+  auth_db_net:
+    driver: bridge
+  api_db_net:
     driver: bridge
   search_net:
     driver: bridge
 
 volumes:
-  db_data:
+  auth_db_data:
+  api_db_data:
   fusionauth_config:
   search_data:
