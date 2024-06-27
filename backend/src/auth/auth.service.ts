@@ -23,10 +23,15 @@ export class AuthService {
     return null;
   }
 
+  private signPayload(payload: PayloadDTO) {
+    return { accessToken: this.jwtService.sign(payload) };
+  }
+
   async signup(signupDTO: SignupDTO) {
     const existingUser = await this.findUserByEmail(signupDTO.email);
     if (existingUser) {
-      throw new UnauthorizedException('Email already in use');
+      // throw new UnauthorizedException('Email already in use');
+      return 'Email already in use';
     }
 
     const hashedPassword = await argon2.hash(signupDTO.password);
@@ -55,7 +60,7 @@ export class AuthService {
     });
   }
 
-  private signPayload(payload: PayloadDTO) {
-    return { accessToken: this.jwtService.sign(payload) };
+  async getProfile(email: string) {
+    return this.findUserByEmail(email);
   }
 }
