@@ -21,14 +21,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(req: any, payload: any) {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-    if (!token) {
-      throw new UnauthorizedException('No token provided');
-    }
+    if (!token) throw new UnauthorizedException('No token provided');
 
     const decodedToken = this.jwtService.decode(token);
-    if (!decodedToken) {
-      throw new UnauthorizedException('Invalid token');
-    }
+    if (!decodedToken) throw new UnauthorizedException('Invalid token');
 
     req.user = decodedToken;
     return { userId: payload.id, username: payload.username };

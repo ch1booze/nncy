@@ -31,10 +31,7 @@ export class AuthService {
 
   async signup(signupDTO: SignupDTO) {
     const existingUser = await this.findUserByEmail(signupDTO.email);
-    if (existingUser) {
-      // throw new UnauthorizedException('Email already in use');
-      return 'Email already in use';
-    }
+    if (existingUser) throw new UnauthorizedException('Email already in use');
 
     const hashedPassword = await argon2.hash(signupDTO.password);
     const newUser = await this.prismaService.user.create({
@@ -52,9 +49,7 @@ export class AuthService {
 
   async login(loginDTO: LoginDTO) {
     const user = await this.validateUser(loginDTO.email, loginDTO.password);
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    if (!user) throw new UnauthorizedException('Invalid credentials');
 
     return this.signPayload({
       username: user.email,
@@ -63,6 +58,7 @@ export class AuthService {
   }
 
   async getProfile(email: string) {
-    return this.findUserByEmail(email);
+    const { firstName, lastName } = await this.findUserByEmail(email);
+    return { email, firstName, lastName };
   }
 }
