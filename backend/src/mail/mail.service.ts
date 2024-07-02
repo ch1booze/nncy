@@ -1,5 +1,5 @@
 import { createClient } from 'smtpexpress';
-import { ResponseDTO } from 'src/response.dto';
+import { ResponseDTO } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';

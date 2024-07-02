@@ -1,3 +1,6 @@
 ✔ Add verification flag to user model. @done(24-06-29 13:39)
 ✔ Implement standardisation of responses. @done(24-07-02 14:34)
-☐ Integrate Swagger for API testing.
+✔ Add user decorator. @done(24-07-02 19:57)
+☐ Implement testing framework.
+☐ Implement a response interceptor.
+☐ Implement a logger service to logging invalid responses (i.e. responses not of type ResponseDTO).

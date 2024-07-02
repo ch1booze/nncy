@@ -1,7 +1,7 @@
 import * as argon2 from 'argon2';
 import { MailService, MailTemplate } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ResponseDTO } from 'src/response.dto';
+import { ResponseDTO } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -31,7 +31,7 @@ export class AuthService {
 
     return ResponseDTO.success(
       HttpStatus.OK,
-      `User's password is correct.`,
+      'User is validated.',
       existingUser,
     );
   }
@@ -46,9 +46,9 @@ export class AuthService {
   }
 
   async signup(signupDTO: SignupDTO) {
-    const { email } = signupDTO;
+    console.log(signupDTO);
     const existingUser = await this.prismaService.user.findUnique({
-      where: { email },
+      where: { email: signupDTO.email },
     });
     if (existingUser)
       return ResponseDTO.error(HttpStatus.CONFLICT, 'Email is already in use.');
@@ -103,7 +103,11 @@ export class AuthService {
     const { firstName, lastName } = profileResponse.data;
     const name = `${firstName} ${lastName}`;
 
-    await this.mailService.sendMail(email, name, MailTemplate.VERIFICATION);
+    return await this.mailService.sendMail(
+      email,
+      name,
+      MailTemplate.VERIFICATION,
+    );
   }
 
   async verifyEmail(token: string) {
@@ -115,7 +119,7 @@ export class AuthService {
       );
 
     const verificationDetails = verifyEmailResponse.data;
-    await this.prismaService.user.update({
+    const updatedUser = await this.prismaService.user.update({
       where: {
         email: verificationDetails.email,
       },
@@ -123,5 +127,13 @@ export class AuthService {
         isVerified: true,
       },
     });
+
+    if (!updatedUser)
+      return ResponseDTO.error(
+        HttpStatus.EXPECTATION_FAILED,
+        "User's email verification status not updated.",
+      );
+
+    return ResponseDTO.success(HttpStatus.OK, "User's email has been verified");
   }
 }

@@ -1,9 +1,11 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ResponseDTO } from 'src/utils/response.dto';
 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
+import { PayloadDTO } from './dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -19,14 +21,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(req: any, payload: any) {
+  async validate(req: any, payload: PayloadDTO) {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-    if (!token) throw new UnauthorizedException('No token provided');
+    if (!token)
+      return ResponseDTO.error(HttpStatus.UNAUTHORIZED, 'No token provided');
 
     const decodedToken = this.jwtService.decode(token);
-    if (!decodedToken) throw new UnauthorizedException('Invalid token');
+    if (!decodedToken)
+      return ResponseDTO.error(HttpStatus.UNAUTHORIZED, 'Invalid token');
 
     req.user = decodedToken;
-    return { userId: payload.id, username: payload.username };
+    const user = { id: payload.id, email: payload.username };
+    return ResponseDTO.success(HttpStatus.OK, 'User has been validated.', user);
   }
 }
