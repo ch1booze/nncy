@@ -1,2 +1,3 @@
 ✔ Add verification flag to user model. @done(24-06-29 13:39)
-☐ Implement standardisation of responses.
+✔ Implement standardisation of responses. @done(24-07-02 14:34)
+☐ Integrate Swagger for API testing.
