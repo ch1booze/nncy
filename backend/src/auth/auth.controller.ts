@@ -22,7 +22,7 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiCreatedResponse({ description: 'User has logged up via email.' })
+  @ApiOkResponse({ description: 'User has logged in via email.' })
   async login(@Body() loginDTO: LoginDTO) {
     return this.authService.login(loginDTO);
   }
