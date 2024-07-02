@@ -6,7 +6,6 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { MailModule } from './mail/mail.module';
-import { TestModule } from './test/test.module';
 
 @Module({
   imports: [
@@ -17,7 +16,6 @@ import { TestModule } from './test/test.module';
       envFilePath: '.env',
     }),
     MailModule,
-    TestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

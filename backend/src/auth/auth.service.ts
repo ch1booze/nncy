@@ -20,38 +20,25 @@ export class AuthService {
     const existingUser = await this.prismaService.user.findUnique({
       where: { email },
     });
-    if (!existingUser)
-      return ResponseDTO.error(HttpStatus.NOT_FOUND, 'User does not exist.');
+    if (!existingUser) return ResponseDTO.error('User does not exist.');
 
     if (!(await argon2.verify(existingUser.password, password)))
-      return ResponseDTO.error(
-        HttpStatus.UNAUTHORIZED,
-        'Inputted password is incorrect.',
-      );
+      return ResponseDTO.error('Password is incorrect.');
 
-    return ResponseDTO.success(
-      HttpStatus.OK,
-      'User is validated.',
-      existingUser,
-    );
+    return ResponseDTO.success('User is validated.', existingUser);
   }
 
   private async signPayload(payload: PayloadDTO) {
     const accessToken = await this.jwtService.signAsync(payload);
-    return ResponseDTO.success(
-      HttpStatus.OK,
-      'Access token has been issued.',
-      accessToken,
-    );
+    return ResponseDTO.success('Access token has been issued.', accessToken);
   }
 
   async signup(signupDTO: SignupDTO) {
-    console.log(signupDTO);
     const existingUser = await this.prismaService.user.findUnique({
       where: { email: signupDTO.email },
     });
     if (existingUser)
-      return ResponseDTO.error(HttpStatus.CONFLICT, 'Email is already in use.');
+      return ResponseDTO.error('Email is already in use.', HttpStatus.CONFLICT);
 
     const hashedPassword = await argon2.hash(signupDTO.password);
     const newUser = await this.prismaService.user.create({
@@ -65,7 +52,10 @@ export class AuthService {
       username: newUser.email,
       id: newUser.id,
     };
-    return this.signPayload(payload);
+
+    const signupResponse = await this.signPayload(payload);
+    signupResponse.statusCode = HttpStatus.CREATED;
+    return signupResponse;
   }
 
   async login(loginDTO: LoginDTO) {
@@ -74,8 +64,10 @@ export class AuthService {
       loginDTO.password,
     );
 
-    if (validateUserResponse.error)
-      return ResponseDTO.error(HttpStatus.UNAUTHORIZED, 'Invalid credentials.');
+    if (!validateUserResponse.success) {
+      validateUserResponse.statusCode = HttpStatus.BAD_REQUEST;
+      return validateUserResponse;
+    }
 
     const validatedUser = validateUserResponse.data;
     const payload: PayloadDTO = {
@@ -92,9 +84,9 @@ export class AuthService {
     const { firstName, lastName } = existingUser;
     const profile: ProfileDTO = { email, firstName, lastName };
     return ResponseDTO.success(
-      HttpStatus.FOUND,
       'User profile has been retrieved.',
       profile,
+      HttpStatus.OK,
     );
   }
 
@@ -112,11 +104,10 @@ export class AuthService {
 
   async verifyEmail(token: string) {
     const verifyEmailResponse = await this.mailService.verifyEmail(token);
-    if (verifyEmailResponse.error)
-      return ResponseDTO.error(
-        HttpStatus.BAD_REQUEST,
-        `User wasn't be verified using email.`,
-      );
+    if (!verifyEmailResponse.success) {
+      verifyEmailResponse.statusCode = HttpStatus.ACCEPTED;
+      return verifyEmailResponse;
+    }
 
     const verificationDetails = verifyEmailResponse.data;
     const updatedUser = await this.prismaService.user.update({
@@ -130,10 +121,11 @@ export class AuthService {
 
     if (!updatedUser)
       return ResponseDTO.error(
-        HttpStatus.EXPECTATION_FAILED,
         "User's email verification status not updated.",
+        HttpStatus.EXPECTATION_FAILED,
       );
 
-    return ResponseDTO.success(HttpStatus.OK, "User's email has been verified");
+    verifyEmailResponse.statusCode = HttpStatus.OK;
+    return verifyEmailResponse;
   }
 }
