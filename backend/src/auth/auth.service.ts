@@ -1,6 +1,6 @@
 import * as argon2 from 'argon2';
-import { MailService, MailTemplate } from 'src/mail/mail.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { MailService, MailTemplate } from 'src/providers/mail.service';
+import { PrismaService } from 'src/providers/prisma.service';
 import { ResponseDTO } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';

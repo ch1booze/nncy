@@ -4,7 +4,7 @@ import { ResponseDTO } from 'src/utils/response.dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class OtpService {
+export class OTPService {
   async generateOTP() {
     const secret = speakeasy.generateSecret({ length: 20 });
     const token = speakeasy.totp({

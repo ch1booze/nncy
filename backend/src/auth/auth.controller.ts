@@ -12,32 +12,32 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() signupDTO: SignupDTO) {
-    return this.authService.signup(signupDTO);
+    return await this.authService.signup(signupDTO);
   }
 
   @Post('login')
   async login(@Body() loginDTO: LoginDTO) {
-    return this.authService.login(loginDTO);
+    return await this.authService.login(loginDTO);
   }
 
   @Get('get-profile')
   @UseGuards(JWTAuthGuard)
   async getProfile(@User() user: any) {
     const { email } = user;
-    return this.authService.getProfile(email);
+    return await this.authService.getProfile(email);
   }
 
   @Get('send-verification-email')
   @UseGuards(JWTAuthGuard)
   async sendVerificationEmail(@User() user: any) {
     const { email } = user;
-    return this.authService.sendVerificationEmail(email);
+    return await this.authService.sendVerificationEmail(email);
   }
 
   @Post('verify-email')
   @UseGuards(JWTAuthGuard)
   async verifyEmail(@User() user: any, @Body('token') token: string) {
     const { email } = user;
-    return this.authService.verifyEmail(email, token);
+    return await this.authService.verifyEmail(email, token);
   }
 }

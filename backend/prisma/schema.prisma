@@ -12,28 +12,32 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email      String  @unique
-  password   String
-  firstName  String
-  lastName   String
+  email     String @unique
+  password  String
+  firstName String
+  lastName  String
+
   secret     String?
   isVerified Boolean @default(false)
   bvn        String? @unique
+
+  dateOfBirth DateTime? @db.Date
 
   accounts Account[]
 }
 
 model Account {
-  id      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  number  String        @unique
-  name    String
-  type    AccountType
-  status  AccountStatus
-  balance Decimal       @db.Money
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  number       String        @unique
+  name         String
+  type         AccountType
+  status       AccountStatus
+  balance      Decimal       @db.Money
+  openingDate  DateTime      @db.Date
+  currencyCode CurrencyCode
 
-  accountPhoneNumber String?
-  accountEmail       String?
-  accountOpeningDate DateTime @db.Date
+  phoneNumber String?
+  email       String?
 
   user   User?   @relation(fields: [userId], references: [id])
   userId String? @db.Uuid
@@ -41,7 +45,6 @@ model Account {
 
 enum AccountStatus {
   Active
-  Inactive
   Dormant
 }
 

@@ -1,6 +1,6 @@
 import { createClient } from 'smtpexpress';
-import { OtpService } from 'src/otp/otp.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { OTPService } from 'src/providers/otp.service';
+import { PrismaService } from 'src/providers/prisma.service';
 import { ResponseDTO } from 'src/utils/response.dto';
 
 import { Injectable } from '@nestjs/common';
@@ -18,7 +18,7 @@ export class MailService {
 
   constructor(
     private configService: ConfigService,
-    private otpService: OtpService,
+    private otpService: OTPService,
     private prismaService: PrismaService,
   ) {
     this.mailClient = createClient({
