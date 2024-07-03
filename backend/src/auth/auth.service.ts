@@ -74,7 +74,10 @@ export class AuthService {
       username: validatedUser.email,
       id: validatedUser.id,
     };
-    return this.signPayload(payload);
+
+    const loginResponse = await this.signPayload(payload);
+    loginResponse.statusCode = HttpStatus.OK;
+    return loginResponse;
   }
 
   async getProfile(email: string) {
