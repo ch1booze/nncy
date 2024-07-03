@@ -36,7 +36,8 @@ export class AuthController {
 
   @Post('verify-email')
   @UseGuards(JWTAuthGuard)
-  async verifyEmail(@Body('token') token: string) {
-    return this.authService.verifyEmail(token);
+  async verifyEmail(@User() user: any, @Body('token') token: string) {
+    const { email } = user;
+    return this.authService.verifyEmail(email, token);
   }
 }

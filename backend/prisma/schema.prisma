@@ -16,6 +16,7 @@ model User {
   password   String
   firstName  String
   lastName   String
+  secret     String?
   isVerified Boolean @default(false)
   bvn        String? @unique
 

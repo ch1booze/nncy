@@ -1,9 +1,10 @@
 import { createClient } from 'smtpexpress';
+import { OtpService } from 'src/otp/otp.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseDTO } from 'src/utils/response.dto';
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 
 export enum MailTemplate {
   VERIFICATION = 'verification',
@@ -17,7 +18,8 @@ export class MailService {
 
   constructor(
     private configService: ConfigService,
-    private jwtService: JwtService,
+    private otpService: OtpService,
+    private prismaService: PrismaService,
   ) {
     this.mailClient = createClient({
       projectId: this.configService.get<string>('SMTPEXPRESS_PROJECT_ID'),
@@ -35,13 +37,20 @@ export class MailService {
     let subject: string;
     let message: string;
 
-    const payload = { email, name };
-    const token = await this.jwtService.signAsync(payload);
+    const generatedOTPResponse = await this.otpService.generateOTP();
+    const { secret, token } = generatedOTPResponse.data;
+    const updatedUser = await this.prismaService.user.update({
+      where: { email },
+      data: { secret },
+    });
+
+    if (!updatedUser)
+      return ResponseDTO.error("User's secret has not been set.");
 
     switch (mailTemplate) {
       case MailTemplate.VERIFICATION:
         subject = 'Email Verification';
-        message = `Verification Code: ${token}`;
+        message = `Your OTP Code: ${token}`;
         break;
 
       case MailTemplate.RESET_PASSWORD:
@@ -67,11 +76,16 @@ export class MailService {
     return ResponseDTO.success('Mail has been sent successfully.');
   }
 
-  async verifyEmail(token: string) {
-    const verificationDetails = await this.jwtService.verifyAsync(token);
-    if (!verificationDetails)
-      return ResponseDTO.error('Token is not verified.');
+  async verifyEmail(email: string, token: string) {
+    const foundUser = await this.prismaService.user.findUnique({
+      where: { email },
+    });
 
-    return ResponseDTO.success('Token is verified.', verificationDetails);
+    const validatedOTPResponse = await this.otpService.validateOTP(
+      foundUser.secret,
+      token,
+    );
+
+    return validatedOTPResponse;
   }
 }

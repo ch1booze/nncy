@@ -1,22 +1,14 @@
+import { OtpService } from 'src/otp/otp.service';
+import { PrismaModule } from 'src/prisma/prisma.module';
+
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 import { MailService } from './mail.service';
 
 @Module({
-  imports: [
-    ConfigModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('MAIL_SECRET'),
-        signOptions: { expiresIn: '20m' },
-      }),
-      inject: [ConfigService],
-    }),
-  ],
-  providers: [MailService],
+  imports: [ConfigModule, PrismaModule],
+  providers: [MailService, OtpService],
   exports: [MailService],
 })
 export class MailModule {}

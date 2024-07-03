@@ -102,18 +102,19 @@ export class AuthService {
     );
   }
 
-  async verifyEmail(token: string) {
-    const verifyEmailResponse = await this.mailService.verifyEmail(token);
+  async verifyEmail(email: string, token: string) {
+    const verifyEmailResponse = await this.mailService.verifyEmail(
+      email,
+      token,
+    );
+
     if (!verifyEmailResponse.success) {
-      verifyEmailResponse.statusCode = HttpStatus.ACCEPTED;
+      verifyEmailResponse.statusCode = HttpStatus.BAD_REQUEST;
       return verifyEmailResponse;
     }
 
-    const verificationDetails = verifyEmailResponse.data;
     const updatedUser = await this.prismaService.user.update({
-      where: {
-        email: verificationDetails.email,
-      },
+      where: { email },
       data: {
         isVerified: true,
       },

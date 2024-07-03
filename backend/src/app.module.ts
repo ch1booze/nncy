@@ -4,8 +4,9 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { PrismaModule } from './prisma/prisma.module';
 import { MailModule } from './mail/mail.module';
+import { OtpModule } from './otp/otp.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MailModule } from './mail/mail.module';
       envFilePath: '.env',
     }),
     MailModule,
+    OtpModule,
   ],
   controllers: [AppController],
   providers: [AppService],
