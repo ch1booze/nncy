@@ -1,6 +1,12 @@
-✔ Add verification flag to user model. @done(24-06-29 13:39)
-✔ Implement standardisation of responses. @done(24-07-02 14:34)
-✔ Add user decorator. @done(24-07-02 19:57)
-☐ Implement testing framework.
-☐ Implement a response interceptor.
-☐ Implement a logger service to logging invalid responses (i.e. responses not of type ResponseDTO).
+Now:
+    ✔ Add verification flag to user model. @done(24-06-29 13:39)
+    ✔ Implement standardisation of responses. @done(24-07-02 14:34)
+    ✔ Add user decorator. @done(24-07-02 19:57)
+    ☐ Create account resource.
+
+Later:
+    ☐ Add validation and confirm password matching to password.
+    ☐ Abstract OTP generation so it is applicable easily to the resetting of password.
+    ☐ Implement testing framework.
+    ☐ Implement a response interceptor.
+    ☐ Implement a logger service to logging invalid responses (i.e. responses not of type ResponseDTO).
