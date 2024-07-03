@@ -1,5 +1,6 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
 import { OBPService } from 'src/providers/obp.service';
+
+import { HttpStatus, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AccountService {

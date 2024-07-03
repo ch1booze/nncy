@@ -1,9 +1,9 @@
 import * as seedrandom from 'seedrandom';
+import { ResponseDTO } from 'src/utils/response.dto';
 
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { AccountStatus, AccountType } from '@prisma/client';
-import { ResponseDTO } from 'src/utils/response.dto';
 
 @Injectable()
 export class OBPService {

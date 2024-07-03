@@ -1,4 +1,6 @@
 import { MailService } from 'src/providers/mail.service';
+import { OBPService } from 'src/providers/obp.service';
+import { OTPService } from 'src/providers/otp.service';
 import { PrismaService } from 'src/providers/prisma.service';
 
 import { Module } from '@nestjs/common';
@@ -9,8 +11,6 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
-import { OTPService } from 'src/providers/otp.service';
-import { OBPService } from 'src/providers/obp.service';
 
 @Module({
   imports: [
