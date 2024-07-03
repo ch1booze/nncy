@@ -7,20 +7,22 @@ import { Injectable } from '@nestjs/common';
 export class OtpService {
   async generateOTP() {
     const secret = speakeasy.generateSecret({ length: 20 });
-    console.log('Something here.');
-    console.log(secret);
-    const token = speakeasy.totp({ secret: secret.base32, encoding: 'base32' });
+    const token = speakeasy.totp({
+      secret: secret.base32,
+      encoding: 'base32',
+    });
     return ResponseDTO.success('OTP has been generated.', {
       secret: secret.base32,
       token,
     });
   }
 
-  async validateOTP(secret: any, token: string) {
+  async validateOTP(secret: string, token: string) {
     const isValid = speakeasy.totp.verify({
-      secret: secret.base32,
-      encoding: 'base32',
+      secret,
       token,
+      encoding: 'base32',
+      window: 25,
     });
 
     if (!isValid) return ResponseDTO.error('Invalid OTP.');
