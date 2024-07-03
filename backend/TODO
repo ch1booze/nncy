@@ -13,3 +13,4 @@ ToDo:
     ☐ Implement a logger service to logging invalid responses (i.e. responses not of type ResponseDTO).
     ☐ Look into how banks ensure security of sensitive information.
     ☐ Decide on commenting and return types strategy.
+    ☐ Investigate slowness in response time.
