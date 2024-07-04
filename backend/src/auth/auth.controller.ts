@@ -1,9 +1,15 @@
 import { User } from 'src/utils/user.decorator';
 
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { LoginDTO, SignupDTO } from './dto';
+import {
+  EmailDTO,
+  LoginDTO,
+  ResetPasswordDTO,
+  SignupDTO,
+  TokenDTO,
+} from './dto';
 import { JWTAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
@@ -36,8 +42,20 @@ export class AuthController {
 
   @Post('verify-email')
   @UseGuards(JWTAuthGuard)
-  async verifyEmail(@User() user: any, @Body('token') token: string) {
+  async verifyEmail(@User() user: any, @Body() tokenDTO: TokenDTO) {
+    const { token } = tokenDTO;
     const { email } = user;
     return await this.authService.verifyEmail(email, token);
+  }
+
+  @Get('send-reset-password-email')
+  async sendResetPasswordEmail(@Body() emailDTO: EmailDTO) {
+    const { email } = emailDTO;
+    return await this.authService.sendResetPasswordEmail(email);
+  }
+
+  @Patch('verify-reset-password')
+  async verifyResetPassword(@Body() resetPasswordDTO: ResetPasswordDTO) {
+    return await this.authService.verifyResetPassword(resetPasswordDTO);
   }
 }

@@ -4,10 +4,10 @@ Done:
     ✔ Implement standardisation of responses. @done(24-07-02 14:34)
     ✔ Create account resource. @done(24-07-03 11:16)
     ✔ Implement a response interceptor. @done(24-07-03 19:28)
+    ✔ Add validation and confirm password matching to password. @done(24-07-04 10:28)
 
 ToDo:
     ☐ Implement account resource.
-    ☐ Add validation and confirm password matching to password.
     ☐ Abstract OTP generation so it is applicable easily to the resetting of password.
     ☐ Implement testing framework.
     ☐ Implement a logger service to logging invalid responses (i.e. responses not of type ResponseDTO).

@@ -1,6 +1,4 @@
 import { createClient } from 'smtpexpress';
-import { OTPService } from 'src/providers/otp.service';
-import { PrismaService } from 'src/providers/prisma.service';
 import { ResponseDTO } from 'src/utils/response.dto';
 
 import { Injectable } from '@nestjs/common';
@@ -16,11 +14,7 @@ export class MailService {
   private mailClient;
   private senderMail;
 
-  constructor(
-    private configService: ConfigService,
-    private otpService: OTPService,
-    private prismaService: PrismaService,
-  ) {
+  constructor(private configService: ConfigService) {
     this.mailClient = createClient({
       projectId: this.configService.get<string>('SMTPEXPRESS_PROJECT_ID'),
       projectSecret: this.configService.get<string>(
@@ -33,29 +27,24 @@ export class MailService {
     );
   }
 
-  async sendMail(email: string, name: string, mailTemplate: MailTemplate) {
+  async sendMail(
+    email: string,
+    name: string,
+    token: string,
+    mailTemplate: MailTemplate,
+  ) {
     let subject: string;
     let message: string;
-
-    const generatedOTPResponse = await this.otpService.generateOTP();
-    const { secret, token } = generatedOTPResponse.data;
-    const updatedUser = await this.prismaService.user.update({
-      where: { email },
-      data: { secret },
-    });
-
-    if (!updatedUser)
-      return ResponseDTO.error("User's secret has not been set.");
 
     switch (mailTemplate) {
       case MailTemplate.VERIFICATION:
         subject = 'Email Verification';
-        message = `Your OTP Code: ${token}`;
+        message = `<h1>Your OTP Code: ${token}</h1>`;
         break;
 
       case MailTemplate.RESET_PASSWORD:
         subject = 'Password Reset Request';
-        message = '<h1>Reset your password</h1>';
+        message = `<h1>Reset your password: ${token}</h1>`;
         break;
 
       default:
@@ -74,18 +63,5 @@ export class MailService {
 
     if (!sendMailResponse) return ResponseDTO.error('Mail has failed to send.');
     return ResponseDTO.success('Mail has been sent successfully.');
-  }
-
-  async verifyEmail(email: string, token: string) {
-    const foundUser = await this.prismaService.user.findUnique({
-      where: { email },
-    });
-
-    const validatedOTPResponse = await this.otpService.validateOTP(
-      foundUser.secret,
-      token,
-    );
-
-    return validatedOTPResponse;
   }
 }
