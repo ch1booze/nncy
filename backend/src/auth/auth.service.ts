@@ -1,6 +1,6 @@
 import * as argon2 from 'argon2';
-import { MailService, MailTemplate } from 'src/providers/mail.service';
-import { OTPService } from 'src/providers/otp.service';
+import { MailProvider, MailTemplate } from 'src/providers/mail.provider';
+import { OTPProvider } from 'src/providers/otp.provider';
 import { PrismaService } from 'src/providers/prisma.service';
 import { ResponseDTO } from 'src/utils/response.dto';
 
@@ -20,8 +20,8 @@ export class AuthService {
   constructor(
     private prismaService: PrismaService,
     private jwtService: JwtService,
-    private mailService: MailService,
-    private otpService: OTPService,
+    private mailProvider: MailProvider,
+    private otpProvider: OTPProvider,
   ) {}
 
   private async validateUser(email: string, password: string) {
@@ -106,7 +106,7 @@ export class AuthService {
     const { firstName, lastName } = profileResponse.data;
     const name = `${firstName} ${lastName}`;
 
-    const generatedOTPResponse = await this.otpService.generateOTP();
+    const generatedOTPResponse = await this.otpProvider.generateOTP();
     const { secret, token } = generatedOTPResponse.data;
     const updatedUser = await this.prismaService.user.update({
       where: { email },
@@ -116,15 +116,20 @@ export class AuthService {
     if (!updatedUser)
       return ResponseDTO.error("User's secret has not been set.");
 
-    const sendMailResponse = await this.mailService.sendMail(
+    const sentMailResponse = await this.mailProvider.sendMail(
       email,
       name,
       token,
       MailTemplate.VERIFICATION,
     );
-    sendMailResponse.statusCode = HttpStatus.OK;
 
-    return sendMailResponse;
+    if (!sentMailResponse.success) {
+      sentMailResponse.statusCode = HttpStatus.BAD_REQUEST;
+      return sentMailResponse;
+    }
+
+    sentMailResponse.statusCode = HttpStatus.OK;
+    return sentMailResponse;
   }
 
   async verifyEmail(email: string, token: string) {
@@ -134,7 +139,7 @@ export class AuthService {
 
     if (!foundUser) return ResponseDTO.error('User not found.');
 
-    const validatedOTPResponse = await this.otpService.validateOTP(
+    const validatedOTPResponse = await this.otpProvider.validateOTP(
       foundUser.secret,
       token,
     );
@@ -175,7 +180,7 @@ export class AuthService {
     const { firstName, lastName } = existingUser;
     const name = `${firstName} ${lastName}`;
 
-    const generatedOTPResponse = await this.otpService.generateOTP();
+    const generatedOTPResponse = await this.otpProvider.generateOTP();
     const { secret, token } = generatedOTPResponse.data;
     const updatedUser = await this.prismaService.user.update({
       where: { email },
@@ -185,7 +190,7 @@ export class AuthService {
     if (!updatedUser)
       return ResponseDTO.error("User's secret has not been set.");
 
-    const sendMailResponse = await this.mailService.sendMail(
+    const sendMailResponse = await this.mailProvider.sendMail(
       email,
       name,
       token,
@@ -204,7 +209,7 @@ export class AuthService {
 
     if (!foundUser) return ResponseDTO.error('User not found.');
 
-    const validatedOTPResponse = await this.otpService.validateOTP(
+    const validatedOTPResponse = await this.otpProvider.validateOTP(
       foundUser.secret,
       token,
     );

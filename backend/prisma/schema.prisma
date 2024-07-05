@@ -27,14 +27,14 @@ model User {
 }
 
 model Account {
-  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  number       String        @unique
-  name         String
-  type         AccountType
-  status       AccountStatus
-  balance      Decimal       @db.Money
-  openingDate  DateTime      @db.Date
-  currencyCode CurrencyCode
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  number      String        @unique
+  type        AccountType
+  status      AccountStatus
+  balance     Decimal       @db.Money
+  bankName    String
+  openingDate DateTime      @db.Date
+  currency    String
 
   phoneNumber String?
   email       String?
@@ -52,14 +52,4 @@ enum AccountType {
   Current
   Savings
   Fixed
-  Domiciliary
-}
-
-enum CurrencyCode {
-  NGN
-  USD
-  GBP
-  EUR
-  CNY
-  JPY
 }

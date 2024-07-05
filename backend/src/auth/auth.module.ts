@@ -1,6 +1,6 @@
-import { MailService } from 'src/providers/mail.service';
-import { OBPService } from 'src/providers/obp.service';
-import { OTPService } from 'src/providers/otp.service';
+import { MailProvider } from 'src/providers/mail.provider';
+import { OBPProvider } from 'src/providers/obp.provider';
+import { OTPProvider } from 'src/providers/otp.provider';
 import { PrismaService } from 'src/providers/prisma.service';
 
 import { Module } from '@nestjs/common';
@@ -30,9 +30,9 @@ import { JwtStrategy } from './jwt.strategy';
     AuthService,
     JwtStrategy,
     PrismaService,
-    MailService,
-    OTPService,
-    OBPService,
+    MailProvider,
+    OTPProvider,
+    OBPProvider,
   ],
 })
 export class AuthModule {}

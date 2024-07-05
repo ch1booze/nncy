@@ -1,4 +1,4 @@
-import { OBPService } from 'src/providers/obp.service';
+import { OBPProvider } from 'src/providers/obp.provider';
 
 import { Module } from '@nestjs/common';
 
@@ -7,6 +7,6 @@ import { AccountService } from './account.service';
 
 @Module({
   controllers: [AccountController],
-  providers: [AccountService, OBPService],
+  providers: [AccountService, OBPProvider],
 })
 export class AccountModule {}

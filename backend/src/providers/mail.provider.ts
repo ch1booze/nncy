@@ -10,7 +10,7 @@ export enum MailTemplate {
 }
 
 @Injectable()
-export class MailService {
+export class MailProvider {
   private mailClient;
   private senderMail;
 
