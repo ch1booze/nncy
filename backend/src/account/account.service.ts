@@ -7,7 +7,7 @@ import { ResponseDTO } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
 
-import { AccountDTO } from './dto/account.dto';
+import { AccountDTO, VerifyBVNDTO } from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
@@ -63,6 +63,44 @@ export class AccountService {
 
     sentSMSResponse.statusCode = HttpStatus.OK;
     return sentSMSResponse;
+  }
+
+  async verifyBVN(email: string, verifyBVNDTO: VerifyBVNDTO) {
+    const existingUserResponse = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+
+    if (!existingUserResponse)
+      return ResponseDTO.error('User does not exist.', HttpStatus.BAD_REQUEST);
+
+    const { secret } = existingUserResponse;
+    const { bvn, otp } = verifyBVNDTO;
+    const isBVNVerifiedResponse = await this.otpProvider.validateOTP(
+      secret,
+      otp,
+    );
+
+    if (!isBVNVerifiedResponse.success) {
+      isBVNVerifiedResponse.statusCode = HttpStatus.BAD_REQUEST;
+      return isBVNVerifiedResponse;
+    }
+
+    const updatedUser = await this.prismaService.user.update({
+      where: { email },
+      data: { bvn, isBVNVerified: true },
+    });
+
+    if (!updatedUser)
+      return ResponseDTO.error(
+        'User was not updated.',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+
+    return ResponseDTO.success(
+      `User's BVN has been updated`,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   async getAccountsLinkedToUser(email: string) {

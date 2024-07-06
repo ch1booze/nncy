@@ -4,7 +4,7 @@ import { User } from 'src/utils/user.decorator';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 
 import { AccountService } from './account.service';
-import { AccountDTO, BVNDTO } from './dto/account.dto';
+import { AccountDTO, BVNDTO, VerifyBVNDTO } from './dto/account.dto';
 
 @Controller('account')
 @UseGuards(JWTAuthGuard)
@@ -16,6 +16,12 @@ export class AccountController {
     const { bvn } = bvnDTO;
     const { email } = user;
     return await this.accountService.sendBVNVerification(email, bvn);
+  }
+
+  @Post('verify-bvn')
+  async verifyBVN(@User() user: any, @Body() verifyBVNDTO: VerifyBVNDTO) {
+    const { email } = user;
+    return await this.accountService.verifyBVN(email, verifyBVNDTO);
   }
 
   @Get('get-accounts-linked-to-user')

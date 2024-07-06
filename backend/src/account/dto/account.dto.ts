@@ -56,3 +56,13 @@ export class BVNDTO {
   @Length(10)
   bvn: string;
 }
+
+export class VerifyBVNDTO {
+  @IsNumberString()
+  @Length(10)
+  bvn: string;
+
+  @IsNumberString()
+  @Length(6)
+  otp: string;
+}
