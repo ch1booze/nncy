@@ -10,10 +10,10 @@ export class BVNProvider {
     faker.seed(Number(bvn));
     seedrandom(Number(bvn));
 
-    const isValidBVN = Math.random() > 0.9;
+    const isValidBVN = Math.random() < 0.9;
     if (isValidBVN) {
       const phoneLinkedToBVN = `+234-${faker.phone.number()}`.replace('-', '');
-      ResponseDTO.success('BVN is valid.', phoneLinkedToBVN);
+      return ResponseDTO.success('BVN is valid.', phoneLinkedToBVN);
     } else return ResponseDTO.error('BVN is invalid.');
   }
 }

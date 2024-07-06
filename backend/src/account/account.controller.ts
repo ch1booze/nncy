@@ -11,16 +11,17 @@ import { AccountDTO, BVNDTO } from './dto/account.dto';
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
-  @Post('verify-bvn')
-  async verifyBVN(@User() user: any, bvnDTO: BVNDTO) {
+  @Post('send-bvn-verification')
+  async sendBVNVerification(@User() user: any, @Body() bvnDTO: BVNDTO) {
     const { bvn } = bvnDTO;
     const { email } = user;
-    return await this.accountService.verifyBVN(email, bvn);
+    return await this.accountService.sendBVNVerification(email, bvn);
   }
 
   @Get('get-accounts-linked-to-user')
-  async getAccountsLinkedToUser(@Body('bvn') bvn: string) {
-    return await this.accountService.getAccountsLinkedToUser(bvn);
+  async getAccountsLinkedToUser(@User() user: any) {
+    const { email } = user;
+    return await this.accountService.getAccountsLinkedToUser(email);
   }
 
   @Post('link-accounts')

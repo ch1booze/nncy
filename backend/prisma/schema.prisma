@@ -12,14 +12,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email     String @unique
+  email     String  @unique
+  bvn       String? @unique
   password  String
   firstName String
   lastName  String
 
-  secret     String?
-  isVerified Boolean @default(false)
-  bvn        String? @unique
+  secret          String?
+  isEmailVerified Boolean @default(false)
+  isBVNVerified   Boolean @default(false)
 
   dateOfBirth DateTime? @db.Date
 

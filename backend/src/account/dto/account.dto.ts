@@ -9,6 +9,8 @@ import {
   Length,
 } from 'class-validator';
 
+import { AccountStatus, AccountType } from '@prisma/client';
+
 export class AccountDTO {
   @IsNumberString()
   @IsNotEmpty()
@@ -16,11 +18,11 @@ export class AccountDTO {
 
   @IsString()
   @IsNotEmpty()
-  type: string;
+  type: AccountType;
 
   @IsString()
   @IsNotEmpty()
-  status: string;
+  status: AccountStatus;
 
   @IsDate()
   @IsNotEmpty()

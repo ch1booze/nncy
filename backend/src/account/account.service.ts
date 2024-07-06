@@ -1,13 +1,13 @@
+import { BVNProvider } from 'src/providers/bvn.provider';
 import { OBPProvider } from 'src/providers/obp.provider';
+import { OTPProvider } from 'src/providers/otp.provider';
 import { PrismaService } from 'src/providers/prisma.service';
+import { SMSProvider, SMSTemplate } from 'src/providers/sms.provider';
+import { ResponseDTO } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
 
 import { AccountDTO } from './dto/account.dto';
-import { ResponseDTO } from 'src/utils/response.dto';
-import { SMSProvider, SMSTemplate } from 'src/providers/sms.provider';
-import { BVNProvider } from 'src/providers/bvn.provider';
-import { OTPProvider } from 'src/providers/otp.provider';
 
 @Injectable()
 export class AccountService {
@@ -19,7 +19,7 @@ export class AccountService {
     private otpProvider: OTPProvider,
   ) {}
 
-  async verifyBVN(email: string, bvn: string) {
+  async sendBVNVerification(email: string, bvn: string) {
     const isVerifiedBVNResponse =
       await this.bvnProvider.getPhoneLinkedToBVN(bvn);
     if (!isVerifiedBVNResponse.success) {
@@ -28,12 +28,14 @@ export class AccountService {
     }
     const phoneLinkedToBVN = isVerifiedBVNResponse.data;
 
-    let isVerified, firstName, lastName;
-    await this.prismaService.user.findUnique({
+    const { isEmailVerified } = await this.prismaService.user.findUnique({
       where: { email },
-      select: { isVerified, firstName, lastName },
     });
-    if (!isVerified) return ResponseDTO.error(`User's email is not verified.`);
+    if (!isEmailVerified)
+      return ResponseDTO.error(
+        `User's email is not verified.`,
+        HttpStatus.BAD_REQUEST,
+      );
 
     const generatedOTPResponse = await this.otpProvider.generateOTP();
     const { secret, token } = generatedOTPResponse.data;
@@ -43,7 +45,10 @@ export class AccountService {
     });
 
     if (!updatedUser)
-      return ResponseDTO.error("User's secret has not been set.");
+      return ResponseDTO.error(
+        "User's secret has not been set.",
+        HttpStatus.BAD_REQUEST,
+      );
 
     const sentSMSResponse = await this.smsProvider.sendSMS(
       phoneLinkedToBVN,
@@ -60,7 +65,16 @@ export class AccountService {
     return sentSMSResponse;
   }
 
-  async getAccountsLinkedToUser(bvn: string) {
+  async getAccountsLinkedToUser(email: string) {
+    let bvn, isBVNVerified;
+    await this.prismaService.user.findUnique({
+      where: { email },
+      select: { bvn, isBVNVerified },
+    });
+
+    if (!isBVNVerified)
+      return ResponseDTO.error('BVN is not verified', HttpStatus.BAD_REQUEST);
+
     const accountsLinkedToUserResponse =
       await this.obpProvider.getAccountsLinkedToUser(bvn);
 

@@ -152,7 +152,7 @@ export class AuthService {
     const updatedUser = await this.prismaService.user.update({
       where: { email },
       data: {
-        isVerified: true,
+        isEmailVerified: true,
       },
     });
 
