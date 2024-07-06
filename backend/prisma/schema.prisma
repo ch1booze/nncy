@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User
 model User {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime @default(now())
@@ -27,6 +28,7 @@ model User {
   accounts Account[]
 }
 
+// Account
 model Account {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   number      String        @unique
@@ -40,8 +42,9 @@ model Account {
   phoneNumber String?
   email       String?
 
-  user   User?   @relation(fields: [userId], references: [id])
-  userId String? @db.Uuid
+  user         User?         @relation(fields: [userId], references: [id])
+  userId       String?       @db.Uuid
+  transactions Transaction[]
 }
 
 enum AccountStatus {
@@ -53,4 +56,20 @@ enum AccountType {
   Current
   Savings
   Fixed
+}
+
+// Transaction
+model Transaction {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+
+  description String
+  type        TransactionType
+  account     Account?        @relation(fields: [accountId], references: [id])
+  accountId   String?         @db.Uuid
+}
+
+enum TransactionType {
+  Inflow
+  Outflow
 }

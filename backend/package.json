@@ -8,7 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "prestart": "docker compose rm --stop && sleep 2 && docker compose up -d && sleep 2 && npx prisma migrate dev",
+    "db:start": "docker compose down -v && sleep 2 && docker volume prune -y && sleep 2 && docker compose up -d",
+    "prestart": "npm run db:start && sleep 2 && npx prisma migrate dev",
     "start": "nest start",
     "start:dev": "npm run prestart && nest start --watch",
     "start:debug": "npm run prestart && nest start --debug --watch",
