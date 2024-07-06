@@ -1,7 +1,7 @@
 import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/utils/user.decorator';
 
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 
 import { AccountService } from './account.service';
 import { AccountDTO, BVNDTO, VerifyBVNDTO } from './dto/account.dto';
@@ -30,7 +30,7 @@ export class AccountController {
     return await this.accountService.getAccountsLinkedToUser(email);
   }
 
-  @Post('link-accounts')
+  @Put('link-accounts')
   async linkAccounts(@User() user: any, @Body() accounts: AccountDTO[]) {
     const { id } = user;
     return this.accountService.linkAccounts(id, accounts);

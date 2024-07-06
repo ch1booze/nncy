@@ -38,7 +38,10 @@ export class OBPProvider {
       const bankName = faker.helpers.arrayElement(OBPProvider.BANK_NAMES);
       const status: AccountStatus = Math.random() < 0.9 ? 'Active' : 'Dormant';
       const balance = Dinero({
-        amount: Number(faker.finance.amount({ min: 100000, max: 1000000 })),
+        amount: parseInt(
+          faker.finance.amount({ min: 100000, max: 1000000 }),
+          10,
+        ),
         currency: 'NGN',
       }).getAmount();
 
