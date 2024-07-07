@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ResponseInterceptor } from './utils/response.interceptor';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ResponseInterceptor } from './utils/response.interceptor';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [
