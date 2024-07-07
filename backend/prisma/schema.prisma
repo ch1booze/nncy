@@ -63,10 +63,12 @@ model Transaction {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime @default(now())
 
+  amount      Decimal         @db.Money
   description String
   type        TransactionType
-  account     Account?        @relation(fields: [accountId], references: [id])
-  accountId   String?         @db.Uuid
+
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String  @db.Uuid
 }
 
 enum TransactionType {
