@@ -26,7 +26,7 @@ export class OBPProvider {
     'Zenith Bank',
   ];
 
-  async getAccountsLinkedToUser(bvn: string) {
+  async getAccountsLinkedToUser(id: string, bvn: string) {
     faker.seed(Number(bvn));
     seedrandom(Number(bvn));
 
@@ -53,6 +53,7 @@ export class OBPProvider {
         type,
         currency: 'NGN',
         status,
+        userId: id,
       };
       accountsLinkedToUser.push(account);
     }

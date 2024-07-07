@@ -48,7 +48,7 @@ export class AccountDTO {
   email?: string;
 
   @IsString()
-  userId?: string;
+  userId: string;
 }
 
 export class BVNDTO {

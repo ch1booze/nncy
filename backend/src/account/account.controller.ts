@@ -26,8 +26,8 @@ export class AccountController {
 
   @Get('get-accounts-linked-to-user')
   async getAccountsLinkedToUser(@User() user: any) {
-    const { email } = user;
-    return await this.accountService.getAccountsLinkedToUser(email);
+    const { id } = user;
+    return await this.accountService.getAccountsLinkedToUser(id);
   }
 
   @Put('link-accounts')

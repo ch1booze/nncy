@@ -103,9 +103,9 @@ export class AccountService {
     );
   }
 
-  async getAccountsLinkedToUser(email: string) {
+  async getAccountsLinkedToUser(id: string) {
     const existingUser = await this.prismaService.user.findUnique({
-      where: { email },
+      where: { id },
     });
 
     const { bvn, isBVNVerified } = existingUser;
@@ -113,7 +113,7 @@ export class AccountService {
       return ResponseDTO.error('BVN is not verified', HttpStatus.BAD_REQUEST);
 
     const accountsLinkedToUserResponse =
-      await this.obpProvider.getAccountsLinkedToUser(bvn);
+      await this.obpProvider.getAccountsLinkedToUser(id, bvn);
 
     accountsLinkedToUserResponse.statusCode = HttpStatus.OK;
     return accountsLinkedToUserResponse;
