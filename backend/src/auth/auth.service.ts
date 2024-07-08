@@ -1,7 +1,7 @@
 import * as argon2 from 'argon2';
 import { MailProvider, MailTemplate } from 'src/providers/mail.provider';
 import { OTPProvider } from 'src/providers/otp.provider';
-import { PrismaService } from 'src/providers/prisma.service';
+import { PrismaProvider } from 'src/providers/prisma.provider';
 import { ResponseDTO } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
@@ -18,14 +18,14 @@ import {
 @Injectable()
 export class AuthService {
   constructor(
-    private prismaService: PrismaService,
+    private prismaProvider: PrismaProvider,
     private jwtService: JwtService,
     private mailProvider: MailProvider,
     private otpProvider: OTPProvider,
   ) {}
 
   private async validateUser(email: string, password: string) {
-    const existingUser = await this.prismaService.user.findUnique({
+    const existingUser = await this.prismaProvider.user.findUnique({
       where: { email },
     });
     if (!existingUser) return ResponseDTO.error('User does not exist.');
@@ -42,14 +42,14 @@ export class AuthService {
   }
 
   async signup(signupDTO: SignupDTO) {
-    const existingUser = await this.prismaService.user.findUnique({
+    const existingUser = await this.prismaProvider.user.findUnique({
       where: { email: signupDTO.email },
     });
     if (existingUser)
       return ResponseDTO.error('Email is already in use.', HttpStatus.CONFLICT);
 
     const hashedPassword = await argon2.hash(signupDTO.password);
-    const newUser = await this.prismaService.user.create({
+    const newUser = await this.prismaProvider.user.create({
       data: {
         ...signupDTO,
         password: hashedPassword,
@@ -89,7 +89,7 @@ export class AuthService {
   }
 
   async getProfile(email: string) {
-    const existingUser = await this.prismaService.user.findUnique({
+    const existingUser = await this.prismaProvider.user.findUnique({
       where: { email },
     });
     const { firstName, lastName } = existingUser;
@@ -108,7 +108,7 @@ export class AuthService {
 
     const generatedOTPResponse = await this.otpProvider.generateOTP();
     const { secret, token } = generatedOTPResponse.data;
-    const updatedUser = await this.prismaService.user.update({
+    const updatedUser = await this.prismaProvider.user.update({
       where: { email },
       data: { secret },
     });
@@ -133,7 +133,7 @@ export class AuthService {
   }
 
   async verifyEmail(email: string, token: string) {
-    const foundUser = await this.prismaService.user.findUnique({
+    const foundUser = await this.prismaProvider.user.findUnique({
       where: { email },
     });
 
@@ -149,7 +149,7 @@ export class AuthService {
       return validatedOTPResponse;
     }
 
-    const updatedUser = await this.prismaService.user.update({
+    const updatedUser = await this.prismaProvider.user.update({
       where: { email },
       data: {
         isEmailVerified: true,
@@ -167,7 +167,7 @@ export class AuthService {
   }
 
   async sendResetPasswordEmail(email: string) {
-    const existingUser = await this.prismaService.user.findUnique({
+    const existingUser = await this.prismaProvider.user.findUnique({
       where: { email },
     });
 
@@ -182,7 +182,7 @@ export class AuthService {
 
     const generatedOTPResponse = await this.otpProvider.generateOTP();
     const { secret, token } = generatedOTPResponse.data;
-    const updatedUser = await this.prismaService.user.update({
+    const updatedUser = await this.prismaProvider.user.update({
       where: { email },
       data: { secret },
     });
@@ -203,7 +203,7 @@ export class AuthService {
   async verifyResetPassword(resetPasswordDTO: ResetPasswordDTO) {
     const { email, token, password } = resetPasswordDTO;
 
-    const foundUser = await this.prismaService.user.findUnique({
+    const foundUser = await this.prismaProvider.user.findUnique({
       where: { email },
     });
 
@@ -220,7 +220,7 @@ export class AuthService {
     }
 
     const hashedPassword = await argon2.hash(password);
-    const updatedUser = await this.prismaService.user.update({
+    const updatedUser = await this.prismaProvider.user.update({
       where: { email },
       data: {
         password: hashedPassword,

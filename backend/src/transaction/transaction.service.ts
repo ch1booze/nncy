@@ -1,5 +1,5 @@
 import * as Dinero from 'dinero.js';
-import { PrismaService } from 'src/providers/prisma.service';
+import { PrismaProvider } from 'src/providers/prisma.provider';
 import { ResponseDTO } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
@@ -9,10 +9,10 @@ import { TransactionType } from '@prisma/client';
 
 @Injectable()
 export class TransactionService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaProvider: PrismaProvider) {}
 
   async sendMoney(id: string, expenseDTO: ExpenseDTO) {
-    const userFromAccount = await this.prismaService.account.findUnique({
+    const userFromAccount = await this.prismaProvider.account.findUnique({
       where: { userId: id, number: expenseDTO.accountNumber },
     });
 
@@ -40,12 +40,12 @@ export class TransactionService {
       );
 
     const newBalance = accountBalance.subtract(expense);
-    await this.prismaService.account.update({
+    await this.prismaProvider.account.update({
       where: { number: expenseDTO.accountNumber },
       data: { balance: newBalance.getAmount() },
     });
 
-    await this.prismaService.transaction.create({
+    await this.prismaProvider.transaction.create({
       data: {
         ...expenseDTO,
         type: TransactionType.Outflow,

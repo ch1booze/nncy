@@ -1,7 +1,7 @@
 import { MailProvider } from 'src/providers/mail.provider';
 import { OBPProvider } from 'src/providers/obp.provider';
 import { OTPProvider } from 'src/providers/otp.provider';
-import { PrismaService } from 'src/providers/prisma.service';
+import { PrismaProvider } from 'src/providers/prisma.provider';
 
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -29,7 +29,7 @@ import { JwtStrategy } from './jwt.strategy';
   providers: [
     AuthService,
     JwtStrategy,
-    PrismaService,
+    PrismaProvider,
     MailProvider,
     OTPProvider,
     OBPProvider,

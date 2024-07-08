@@ -1,7 +1,7 @@
 import { BVNProvider } from 'src/providers/bvn.provider';
 import { OBPProvider } from 'src/providers/obp.provider';
 import { OTPProvider } from 'src/providers/otp.provider';
-import { PrismaService } from 'src/providers/prisma.service';
+import { PrismaProvider } from 'src/providers/prisma.provider';
 import { SMSProvider, SMSTemplate } from 'src/providers/sms.provider';
 import { ResponseDTO } from 'src/utils/response.dto';
 
@@ -13,7 +13,7 @@ import { AccountDTO, VerifyBVNDTO } from './dto/account.dto';
 export class AccountService {
   constructor(
     private obpProvider: OBPProvider,
-    private prismaService: PrismaService,
+    private prismaProvider: PrismaProvider,
     private smsProvider: SMSProvider,
     private bvnProvider: BVNProvider,
     private otpProvider: OTPProvider,
@@ -28,7 +28,7 @@ export class AccountService {
     }
     const phoneLinkedToBVN = isVerifiedBVNResponse.data;
 
-    const { isEmailVerified } = await this.prismaService.user.findUnique({
+    const { isEmailVerified } = await this.prismaProvider.user.findUnique({
       where: { email },
     });
     if (!isEmailVerified)
@@ -39,7 +39,7 @@ export class AccountService {
 
     const generatedOTPResponse = await this.otpProvider.generateOTP();
     const { secret, token } = generatedOTPResponse.data;
-    const updatedUser = await this.prismaService.user.update({
+    const updatedUser = await this.prismaProvider.user.update({
       where: { email },
       data: { secret },
     });
@@ -66,7 +66,7 @@ export class AccountService {
   }
 
   async verifyBVN(email: string, verifyBVNDTO: VerifyBVNDTO) {
-    const existingUserResponse = await this.prismaService.user.findUnique({
+    const existingUserResponse = await this.prismaProvider.user.findUnique({
       where: { email },
     });
 
@@ -85,7 +85,7 @@ export class AccountService {
       return isBVNVerifiedResponse;
     }
 
-    const updatedUser = await this.prismaService.user.update({
+    const updatedUser = await this.prismaProvider.user.update({
       where: { email },
       data: { bvn, isBVNVerified: true },
     });
@@ -104,7 +104,7 @@ export class AccountService {
   }
 
   async getAccountsLinkedToUser(id: string) {
-    const existingUser = await this.prismaService.user.findUnique({
+    const existingUser = await this.prismaProvider.user.findUnique({
       where: { id },
     });
 
@@ -124,7 +124,7 @@ export class AccountService {
       account.userId = id;
     });
 
-    await this.prismaService.account.createMany({
+    await this.prismaProvider.account.createMany({
       data: accounts,
       skipDuplicates: true,
     });
