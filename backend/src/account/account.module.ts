@@ -1,8 +1,8 @@
-import { BVNProvider } from 'src/providers/bvn.provider';
-import { OBPProvider } from 'src/providers/obp.provider';
-import { OTPProvider } from 'src/providers/otp.provider';
+import { BvnProvider } from 'src/providers/bvn.provider';
+import { ObpProvider } from 'src/providers/obp.provider';
+import { OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
-import { SMSProvider } from 'src/providers/sms.provider';
+import { SmsProvider } from 'src/providers/sms.provider';
 
 import { Module } from '@nestjs/common';
 
@@ -13,11 +13,11 @@ import { AccountService } from './account.service';
   controllers: [AccountController],
   providers: [
     AccountService,
-    OBPProvider,
+    ObpProvider,
     PrismaProvider,
-    OTPProvider,
-    SMSProvider,
-    BVNProvider,
+    OtpProvider,
+    SmsProvider,
+    BvnProvider,
   ],
 })
 export class AccountModule {}

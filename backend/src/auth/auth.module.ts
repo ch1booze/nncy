@@ -1,6 +1,6 @@
 import { MailProvider } from 'src/providers/mail.provider';
-import { OBPProvider } from 'src/providers/obp.provider';
-import { OTPProvider } from 'src/providers/otp.provider';
+import { ObpProvider } from 'src/providers/obp.provider';
+import { OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
 
 import { Module } from '@nestjs/common';
@@ -19,7 +19,7 @@ import { JwtStrategy } from './jwt.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: configService.get<string>('Jwt_SECRET'),
         signOptions: { expiresIn: '1h' },
       }),
       inject: [ConfigService],
@@ -31,8 +31,8 @@ import { JwtStrategy } from './jwt.strategy';
     JwtStrategy,
     PrismaProvider,
     MailProvider,
-    OTPProvider,
-    OBPProvider,
+    OtpProvider,
+    ObpProvider,
   ],
 })
 export class AuthModule {}

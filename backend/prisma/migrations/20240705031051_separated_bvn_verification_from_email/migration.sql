@@ -26,7 +26,7 @@ ADD COLUMN     "currency" TEXT NOT NULL;
 
 -- AlterTable
 ALTER TABLE "User" DROP COLUMN "isVerified",
-ADD COLUMN     "isBVNVerified" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "isBvnVerified" BOOLEAN NOT NULL DEFAULT false,
 ADD COLUMN     "isEmailVerified" BOOLEAN NOT NULL DEFAULT false;
 
 -- DropEnum

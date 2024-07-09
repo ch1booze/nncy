@@ -51,13 +51,13 @@ export class AccountDTO {
   userId: string;
 }
 
-export class BVNDTO {
+export class BvnDTO {
   @IsNumberString()
   @Length(10)
   bvn: string;
 }
 
-export class VerifyBVNDTO {
+export class VerifyBvnDTO {
   @IsNumberString()
   @Length(10)
   bvn: string;

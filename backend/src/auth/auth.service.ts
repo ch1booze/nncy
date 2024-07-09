@@ -1,6 +1,6 @@
 import * as argon2 from 'argon2';
 import { MailProvider, MailTemplate } from 'src/providers/mail.provider';
-import { OTPProvider } from 'src/providers/otp.provider';
+import { OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
 import { ResponseDTO } from 'src/utils/response.dto';
 
@@ -21,7 +21,7 @@ export class AuthService {
     private prismaProvider: PrismaProvider,
     private jwtService: JwtService,
     private mailProvider: MailProvider,
-    private otpProvider: OTPProvider,
+    private otpProvider: OtpProvider,
   ) {}
 
   private async validateUser(email: string, password: string) {
@@ -106,8 +106,8 @@ export class AuthService {
     const { firstName, lastName } = profileResponse.data;
     const name = `${firstName} ${lastName}`;
 
-    const generatedOTPResponse = await this.otpProvider.generateOTP();
-    const { secret, token } = generatedOTPResponse.data;
+    const generatedOtpResponse = await this.otpProvider.generateOtp();
+    const { secret, token } = generatedOtpResponse.data;
     const updatedUser = await this.prismaProvider.user.update({
       where: { email },
       data: { secret },
@@ -139,14 +139,14 @@ export class AuthService {
 
     if (!foundUser) return ResponseDTO.error('User not found.');
 
-    const validatedOTPResponse = await this.otpProvider.validateOTP(
+    const validatedOtpResponse = await this.otpProvider.validateOtp(
       foundUser.secret,
       token,
     );
 
-    if (!validatedOTPResponse.success) {
-      validatedOTPResponse.statusCode = HttpStatus.BAD_REQUEST;
-      return validatedOTPResponse;
+    if (!validatedOtpResponse.success) {
+      validatedOtpResponse.statusCode = HttpStatus.BAD_REQUEST;
+      return validatedOtpResponse;
     }
 
     const updatedUser = await this.prismaProvider.user.update({
@@ -162,8 +162,8 @@ export class AuthService {
         HttpStatus.EXPECTATION_FAILED,
       );
 
-    validatedOTPResponse.statusCode = HttpStatus.OK;
-    return validatedOTPResponse;
+    validatedOtpResponse.statusCode = HttpStatus.OK;
+    return validatedOtpResponse;
   }
 
   async sendResetPasswordEmail(email: string) {
@@ -180,8 +180,8 @@ export class AuthService {
     const { firstName, lastName } = existingUser;
     const name = `${firstName} ${lastName}`;
 
-    const generatedOTPResponse = await this.otpProvider.generateOTP();
-    const { secret, token } = generatedOTPResponse.data;
+    const generatedOtpResponse = await this.otpProvider.generateOtp();
+    const { secret, token } = generatedOtpResponse.data;
     const updatedUser = await this.prismaProvider.user.update({
       where: { email },
       data: { secret },
@@ -209,14 +209,14 @@ export class AuthService {
 
     if (!foundUser) return ResponseDTO.error('User not found.');
 
-    const validatedOTPResponse = await this.otpProvider.validateOTP(
+    const validatedOtpResponse = await this.otpProvider.validateOtp(
       foundUser.secret,
       token,
     );
 
-    if (!validatedOTPResponse.success) {
-      validatedOTPResponse.statusCode = HttpStatus.BAD_REQUEST;
-      return validatedOTPResponse;
+    if (!validatedOtpResponse.success) {
+      validatedOtpResponse.statusCode = HttpStatus.BAD_REQUEST;
+      return validatedOtpResponse;
     }
 
     const hashedPassword = await argon2.hash(password);
@@ -233,7 +233,7 @@ export class AuthService {
         HttpStatus.EXPECTATION_FAILED,
       );
 
-    validatedOTPResponse.statusCode = HttpStatus.OK;
-    return validatedOTPResponse;
+    validatedOtpResponse.statusCode = HttpStatus.OK;
+    return validatedOtpResponse;
   }
 }

@@ -4,12 +4,12 @@ import { ResponseDTO } from 'src/utils/response.dto';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-export enum SMSTemplate {
-  BVN_VERIFICATION = 'bvn-verification',
+export enum SmsTemplate {
+  Bvn_VERIFICATION = 'bvn-verification',
 }
 
 @Injectable()
-export class SMSProvider {
+export class SmsProvider {
   private smsClient;
   private senderPhone;
 
@@ -20,30 +20,30 @@ export class SMSProvider {
     // this.smsClient = new Twilio(accountSID, authToken);
   }
 
-  async sendSMS(phone: string, token: string, smsTemplate: SMSTemplate) {
+  async sendSms(phone: string, token: string, smsTemplate: SmsTemplate) {
     let subject;
     let message;
 
     switch (smsTemplate) {
-      case SMSTemplate.BVN_VERIFICATION:
-        subject = 'BVN Verification';
-        message = `Your OTP Code: ${token}`;
+      case SmsTemplate.Bvn_VERIFICATION:
+        subject = 'Bvn Verification';
+        message = `Your Otp Code: ${token}`;
         break;
 
       default:
-        return ResponseDTO.error('SMS template is invalid.');
+        return ResponseDTO.error('Sms template is invalid.');
     }
 
-    // const sendSMSResponse = this.smsClient.messages.create({
+    // const sendSmsResponse = this.smsClient.messages.create({
     //   body: `${subject}:\n${message}`,
     //   from: this.senderPhone,
     //   to: phone,
     // });
 
-    const sendSMSResponse =
+    const sendSmsResponse =
       Math.random() < 0.9 ? `${subject}:\n${message}` : null;
 
-    if (!sendSMSResponse) return ResponseDTO.error('SMS has failed to send.');
-    return ResponseDTO.success('Sent', sendSMSResponse);
+    if (!sendSmsResponse) return ResponseDTO.error('Sms has failed to send.');
+    return ResponseDTO.success('Sent', sendSmsResponse);
   }
 }

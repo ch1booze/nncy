@@ -1,27 +1,27 @@
-import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/utils/user.decorator';
 
 import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 
 import { AccountService } from './account.service';
-import { AccountDTO, BVNDTO, VerifyBVNDTO } from './dto/account.dto';
+import { AccountDTO, BvnDTO, VerifyBvnDTO } from './dto/account.dto';
 
 @Controller('account')
-@UseGuards(JWTAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   @Post('send-bvn-verification')
-  async sendBVNVerification(@User() user: any, @Body() bvnDTO: BVNDTO) {
+  async sendBvnVerification(@User() user: any, @Body() bvnDTO: BvnDTO) {
     const { bvn } = bvnDTO;
     const { email } = user;
-    return await this.accountService.sendBVNVerification(email, bvn);
+    return await this.accountService.sendBvnVerification(email, bvn);
   }
 
   @Post('verify-bvn')
-  async verifyBVN(@User() user: any, @Body() verifyBVNDTO: VerifyBVNDTO) {
+  async verifyBvn(@User() user: any, @Body() verifyBvnDTO: VerifyBvnDTO) {
     const { email } = user;
-    return await this.accountService.verifyBVN(email, verifyBVNDTO);
+    return await this.accountService.verifyBvn(email, verifyBvnDTO);
   }
 
   @Get('get-accounts-linked-to-user')

@@ -1,4 +1,4 @@
-import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 
@@ -7,7 +7,7 @@ import { TransactionService } from './transaction.service';
 import { User } from 'src/utils/user.decorator';
 
 @Controller('transaction')
-@UseGuards(JWTAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
   @Post('send-money')

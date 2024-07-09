@@ -39,7 +39,7 @@ export class MailProvider {
     switch (mailTemplate) {
       case MailTemplate.VERIFICATION:
         subject = 'Email Verification';
-        message = `<h1>Your OTP Code: ${token}</h1>`;
+        message = `<h1>Your Otp Code: ${token}</h1>`;
         break;
 
       case MailTemplate.RESET_PASSWORD:

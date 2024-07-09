@@ -8,7 +8,7 @@ Done:
 
 ToDo:
     ☐ Implement account resource.
-    ☐ Abstract OTP generation so it is applicable easily to the resetting of password.
+    ☐ Abstract Otp generation so it is applicable easily to the resetting of password.
     ☐ Implement testing framework.
     ☐ Implement a logger service to logging invalid responses (i.e. responses not of type ResponseDTO).
     ☐ Look into how banks ensure security of sensitive information.

@@ -8,7 +8,7 @@ import { Injectable } from '@nestjs/common';
 import { AccountStatus, AccountType } from '@prisma/client';
 
 @Injectable()
-export class OBPProvider {
+export class ObpProvider {
   static NUMBER_OF_ACCOUNTS = 5;
   static ACCOUNT_TYPES: AccountType[] = ['Current', 'Fixed', 'Savings'];
   static BANK_NAMES = [
@@ -31,11 +31,11 @@ export class OBPProvider {
     seedrandom(Number(bvn));
 
     const accountsLinkedToUser: AccountDTO[] = [];
-    for (let i = 0; i < OBPProvider.NUMBER_OF_ACCOUNTS; i++) {
+    for (let i = 0; i < ObpProvider.NUMBER_OF_ACCOUNTS; i++) {
       const type: AccountType = faker.helpers.arrayElement(
-        OBPProvider.ACCOUNT_TYPES,
+        ObpProvider.ACCOUNT_TYPES,
       );
-      const bankName = faker.helpers.arrayElement(OBPProvider.BANK_NAMES);
+      const bankName = faker.helpers.arrayElement(ObpProvider.BANK_NAMES);
       const status: AccountStatus = Math.random() < 0.9 ? 'Active' : 'Dormant';
       const balance = Dinero({
         amount: parseInt(

@@ -1,32 +1,32 @@
-import { BVNProvider } from 'src/providers/bvn.provider';
-import { OBPProvider } from 'src/providers/obp.provider';
-import { OTPProvider } from 'src/providers/otp.provider';
+import { BvnProvider } from 'src/providers/bvn.provider';
+import { ObpProvider } from 'src/providers/obp.provider';
+import { OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
-import { SMSProvider, SMSTemplate } from 'src/providers/sms.provider';
+import { SmsProvider, SmsTemplate } from 'src/providers/sms.provider';
 import { ResponseDTO } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
 
-import { AccountDTO, VerifyBVNDTO } from './dto/account.dto';
+import { AccountDTO, VerifyBvnDTO } from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
   constructor(
-    private obpProvider: OBPProvider,
+    private obpProvider: ObpProvider,
     private prismaProvider: PrismaProvider,
-    private smsProvider: SMSProvider,
-    private bvnProvider: BVNProvider,
-    private otpProvider: OTPProvider,
+    private smsProvider: SmsProvider,
+    private bvnProvider: BvnProvider,
+    private otpProvider: OtpProvider,
   ) {}
 
-  async sendBVNVerification(email: string, bvn: string) {
-    const isVerifiedBVNResponse =
-      await this.bvnProvider.getPhoneLinkedToBVN(bvn);
-    if (!isVerifiedBVNResponse.success) {
-      isVerifiedBVNResponse.statusCode = HttpStatus.BAD_REQUEST;
-      return isVerifiedBVNResponse;
+  async sendBvnVerification(email: string, bvn: string) {
+    const isVerifiedBvnResponse =
+      await this.bvnProvider.getPhoneLinkedToBvn(bvn);
+    if (!isVerifiedBvnResponse.success) {
+      isVerifiedBvnResponse.statusCode = HttpStatus.BAD_REQUEST;
+      return isVerifiedBvnResponse;
     }
-    const phoneLinkedToBVN = isVerifiedBVNResponse.data;
+    const phoneLinkedToBvn = isVerifiedBvnResponse.data;
 
     const { isEmailVerified } = await this.prismaProvider.user.findUnique({
       where: { email },
@@ -37,8 +37,8 @@ export class AccountService {
         HttpStatus.BAD_REQUEST,
       );
 
-    const generatedOTPResponse = await this.otpProvider.generateOTP();
-    const { secret, token } = generatedOTPResponse.data;
+    const generatedOtpResponse = await this.otpProvider.generateOtp();
+    const { secret, token } = generatedOtpResponse.data;
     const updatedUser = await this.prismaProvider.user.update({
       where: { email },
       data: { secret },
@@ -50,22 +50,22 @@ export class AccountService {
         HttpStatus.BAD_REQUEST,
       );
 
-    const sentSMSResponse = await this.smsProvider.sendSMS(
-      phoneLinkedToBVN,
+    const sentSmsResponse = await this.smsProvider.sendSms(
+      phoneLinkedToBvn,
       token,
-      SMSTemplate.BVN_VERIFICATION,
+      SmsTemplate.Bvn_VERIFICATION,
     );
 
-    if (!sentSMSResponse.success) {
-      sentSMSResponse.statusCode = HttpStatus.BAD_REQUEST;
-      return sentSMSResponse;
+    if (!sentSmsResponse.success) {
+      sentSmsResponse.statusCode = HttpStatus.BAD_REQUEST;
+      return sentSmsResponse;
     }
 
-    sentSMSResponse.statusCode = HttpStatus.OK;
-    return sentSMSResponse;
+    sentSmsResponse.statusCode = HttpStatus.OK;
+    return sentSmsResponse;
   }
 
-  async verifyBVN(email: string, verifyBVNDTO: VerifyBVNDTO) {
+  async verifyBvn(email: string, verifyBvnDTO: VerifyBvnDTO) {
     const existingUserResponse = await this.prismaProvider.user.findUnique({
       where: { email },
     });
@@ -74,20 +74,20 @@ export class AccountService {
       return ResponseDTO.error('User does not exist.', HttpStatus.BAD_REQUEST);
 
     const { secret } = existingUserResponse;
-    const { bvn, otp } = verifyBVNDTO;
-    const isBVNVerifiedResponse = await this.otpProvider.validateOTP(
+    const { bvn, otp } = verifyBvnDTO;
+    const isBvnVerifiedResponse = await this.otpProvider.validateOtp(
       secret,
       otp,
     );
 
-    if (!isBVNVerifiedResponse.success) {
-      isBVNVerifiedResponse.statusCode = HttpStatus.BAD_REQUEST;
-      return isBVNVerifiedResponse;
+    if (!isBvnVerifiedResponse.success) {
+      isBvnVerifiedResponse.statusCode = HttpStatus.BAD_REQUEST;
+      return isBvnVerifiedResponse;
     }
 
     const updatedUser = await this.prismaProvider.user.update({
       where: { email },
-      data: { bvn, isBVNVerified: true },
+      data: { bvn, isBvnVerified: true },
     });
 
     if (!updatedUser)
@@ -97,7 +97,7 @@ export class AccountService {
       );
 
     return ResponseDTO.success(
-      `User's BVN has been updated`,
+      `User's Bvn has been updated`,
       null,
       HttpStatus.OK,
     );
@@ -108,9 +108,9 @@ export class AccountService {
       where: { id },
     });
 
-    const { bvn, isBVNVerified } = existingUser;
-    if (!isBVNVerified)
-      return ResponseDTO.error('BVN is not verified', HttpStatus.BAD_REQUEST);
+    const { bvn, isBvnVerified } = existingUser;
+    if (!isBvnVerified)
+      return ResponseDTO.error('Bvn is not verified', HttpStatus.BAD_REQUEST);
 
     const accountsLinkedToUserResponse =
       await this.obpProvider.getAccountsLinkedToUser(id, bvn);

@@ -10,7 +10,7 @@ import {
   SignupDTO,
   TokenDTO,
 } from './dto';
-import { JWTAuthGuard } from './jwt-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -27,21 +27,21 @@ export class AuthController {
   }
 
   @Get('get-profile')
-  @UseGuards(JWTAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getProfile(@User() user: any) {
     const { email } = user;
     return await this.authService.getProfile(email);
   }
 
   @Get('send-verification-email')
-  @UseGuards(JWTAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async sendVerificationEmail(@User() user: any) {
     const { email } = user;
     return await this.authService.sendVerificationEmail(email);
   }
 
   @Post('verify-email')
-  @UseGuards(JWTAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async verifyEmail(@User() user: any, @Body() tokenDTO: TokenDTO) {
     const { token } = tokenDTO;
     const { email } = user;

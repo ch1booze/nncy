@@ -21,7 +21,7 @@ model User {
 
   secret          String?
   isEmailVerified Boolean @default(false)
-  isBVNVerified   Boolean @default(false)
+  isBvnVerified   Boolean @default(false)
 
   dateOfBirth DateTime? @db.Date
 

@@ -5,15 +5,15 @@ import { Injectable } from '@nestjs/common';
 import { ResponseDTO } from 'src/utils/response.dto';
 
 @Injectable()
-export class BVNProvider {
-  async getPhoneLinkedToBVN(bvn: string) {
+export class BvnProvider {
+  async getPhoneLinkedToBvn(bvn: string) {
     faker.seed(Number(bvn));
     seedrandom(Number(bvn));
 
-    const isValidBVN = Math.random() < 0.9;
-    if (isValidBVN) {
-      const phoneLinkedToBVN = `+234-${faker.phone.number()}`.replace('-', '');
-      return ResponseDTO.success('BVN is valid.', phoneLinkedToBVN);
-    } else return ResponseDTO.error('BVN is invalid.');
+    const isValidBvn = Math.random() < 0.9;
+    if (isValidBvn) {
+      const phoneLinkedToBvn = `+234-${faker.phone.number()}`.replace('-', '');
+      return ResponseDTO.success('Bvn is valid.', phoneLinkedToBvn);
+    } else return ResponseDTO.error('Bvn is invalid.');
   }
 }
