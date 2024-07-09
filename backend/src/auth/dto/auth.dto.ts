@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { Match } from 'src/utils/match.decorator';
 
-export class SignupDTO {
+export class SignupDto {
   @IsString()
   @IsNotEmpty()
   firstName: string;
@@ -34,7 +34,7 @@ export class SignupDTO {
   confirmPassword: string;
 }
 
-export class LoginDTO {
+export class LoginDto {
   @IsString()
   @IsNotEmpty()
   email: string;
@@ -44,7 +44,7 @@ export class LoginDTO {
   password: string;
 }
 
-export class PayloadDTO {
+export class PayloadDto {
   @IsString()
   username: string;
 
@@ -52,26 +52,26 @@ export class PayloadDTO {
   id: string;
 }
 
-export class ProfileDTO {
+export class ProfileDto {
   email: string;
   firstName: string;
   lastName: string;
 }
 
-export class EmailDTO {
+export class EmailDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
 }
 
-export class TokenDTO {
+export class TokenDto {
   @IsNumberString()
   @IsNotEmpty()
   @Length(6)
   token: string;
 }
 
-export class ResetPasswordDTO {
+export class ResetPasswordDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;

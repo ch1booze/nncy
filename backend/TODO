@@ -10,7 +10,7 @@ ToDo:
     ☐ Implement account resource.
     ☐ Abstract Otp generation so it is applicable easily to the resetting of password.
     ☐ Implement testing framework.
-    ☐ Implement a logger service to logging invalid responses (i.e. responses not of type ResponseDTO).
+    ☐ Implement a logger service to logging invalid responses (i.e. responses not of type ResponseDto).
     ☐ Look into how banks ensure security of sensitive information.
     ☐ Decide on commenting and return types strategy.
     ☐ Investigate slowness in response time.

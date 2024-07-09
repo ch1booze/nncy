@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumberString, IsString, Length } from 'class-validator';
 
-export class ExpenseDTO {
+export class ExpenseDto {
   @IsNotEmpty()
   amount: number;
 

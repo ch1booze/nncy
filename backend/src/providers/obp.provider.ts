@@ -1,7 +1,7 @@
 import * as Dinero from 'dinero.js';
 import * as seedrandom from 'seedrandom';
-import { AccountDTO } from 'src/account/dto/account.dto';
-import { ResponseDTO } from 'src/utils/response.dto';
+import { AccountDto } from 'src/account/dto/account.dto';
+import { ResponseDto } from 'src/utils/response.dto';
 
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
@@ -30,7 +30,7 @@ export class ObpProvider {
     faker.seed(Number(bvn));
     seedrandom(Number(bvn));
 
-    const accountsLinkedToUser: AccountDTO[] = [];
+    const accountsLinkedToUser: AccountDto[] = [];
     for (let i = 0; i < ObpProvider.NUMBER_OF_ACCOUNTS; i++) {
       const type: AccountType = faker.helpers.arrayElement(
         ObpProvider.ACCOUNT_TYPES,
@@ -45,7 +45,7 @@ export class ObpProvider {
         currency: 'NGN',
       }).getAmount();
 
-      const account: AccountDTO = {
+      const account: AccountDto = {
         number: faker.finance.accountNumber(10),
         openingDate: faker.date.past({ years: i + 1 }),
         balance,
@@ -58,7 +58,7 @@ export class ObpProvider {
       accountsLinkedToUser.push(account);
     }
 
-    return ResponseDTO.success(
+    return ResponseDto.success(
       'Accounts linked to user have been retrieved.',
       accountsLinkedToUser,
     );

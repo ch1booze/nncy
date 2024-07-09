@@ -2,17 +2,17 @@ import * as argon2 from 'argon2';
 import { MailProvider, MailTemplate } from 'src/providers/mail.provider';
 import { OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
-import { ResponseDTO } from 'src/utils/response.dto';
+import { ResponseDto } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import {
-  LoginDTO,
-  PayloadDTO,
-  ProfileDTO,
-  ResetPasswordDTO,
-  SignupDTO,
+  LoginDto,
+  PayloadDto,
+  ProfileDto,
+  ResetPasswordDto,
+  SignupDto,
 } from './dto';
 
 @Injectable()
@@ -28,35 +28,35 @@ export class AuthService {
     const existingUser = await this.prismaProvider.user.findUnique({
       where: { email },
     });
-    if (!existingUser) return ResponseDTO.error('User does not exist.');
+    if (!existingUser) return ResponseDto.error('User does not exist.');
 
     if (!(await argon2.verify(existingUser.password, password)))
-      return ResponseDTO.error('Password is incorrect.');
+      return ResponseDto.error('Password is incorrect.');
 
-    return ResponseDTO.success('User is validated.', existingUser);
+    return ResponseDto.success('User is validated.', existingUser);
   }
 
-  private async signPayload(payload: PayloadDTO) {
+  private async signPayload(payload: PayloadDto) {
     const accessToken = await this.jwtService.signAsync(payload);
-    return ResponseDTO.success('Access token has been issued.', accessToken);
+    return ResponseDto.success('Access token has been issued.', accessToken);
   }
 
-  async signup(signupDTO: SignupDTO) {
+  async signup(signupDto: SignupDto) {
     const existingUser = await this.prismaProvider.user.findUnique({
-      where: { email: signupDTO.email },
+      where: { email: signupDto.email },
     });
     if (existingUser)
-      return ResponseDTO.error('Email is already in use.', HttpStatus.CONFLICT);
+      return ResponseDto.error('Email is already in use.', HttpStatus.CONFLICT);
 
-    const hashedPassword = await argon2.hash(signupDTO.password);
+    const hashedPassword = await argon2.hash(signupDto.password);
     const newUser = await this.prismaProvider.user.create({
       data: {
-        ...signupDTO,
+        ...signupDto,
         password: hashedPassword,
       },
     });
 
-    const payload: PayloadDTO = {
+    const payload: PayloadDto = {
       username: newUser.email,
       id: newUser.id,
     };
@@ -66,10 +66,10 @@ export class AuthService {
     return signupResponse;
   }
 
-  async login(loginDTO: LoginDTO) {
+  async login(loginDto: LoginDto) {
     const validateUserResponse = await this.validateUser(
-      loginDTO.email,
-      loginDTO.password,
+      loginDto.email,
+      loginDto.password,
     );
 
     if (!validateUserResponse.success) {
@@ -78,7 +78,7 @@ export class AuthService {
     }
 
     const validatedUser = validateUserResponse.data;
-    const payload: PayloadDTO = {
+    const payload: PayloadDto = {
       username: validatedUser.email,
       id: validatedUser.id,
     };
@@ -93,8 +93,8 @@ export class AuthService {
       where: { email },
     });
     const { firstName, lastName } = existingUser;
-    const profile: ProfileDTO = { email, firstName, lastName };
-    return ResponseDTO.success(
+    const profile: ProfileDto = { email, firstName, lastName };
+    return ResponseDto.success(
       'User profile has been retrieved.',
       profile,
       HttpStatus.OK,
@@ -114,7 +114,7 @@ export class AuthService {
     });
 
     if (!updatedUser)
-      return ResponseDTO.error("User's secret has not been set.");
+      return ResponseDto.error("User's secret has not been set.");
 
     const sentMailResponse = await this.mailProvider.sendMail(
       email,
@@ -137,7 +137,7 @@ export class AuthService {
       where: { email },
     });
 
-    if (!foundUser) return ResponseDTO.error('User not found.');
+    if (!foundUser) return ResponseDto.error('User not found.');
 
     const validatedOtpResponse = await this.otpProvider.validateOtp(
       foundUser.secret,
@@ -157,7 +157,7 @@ export class AuthService {
     });
 
     if (!updatedUser)
-      return ResponseDTO.error(
+      return ResponseDto.error(
         "User's email verification status not updated.",
         HttpStatus.EXPECTATION_FAILED,
       );
@@ -172,7 +172,7 @@ export class AuthService {
     });
 
     if (!existingUser)
-      return ResponseDTO.error(
+      return ResponseDto.error(
         'Email is not registered.',
         HttpStatus.BAD_REQUEST,
       );
@@ -188,7 +188,7 @@ export class AuthService {
     });
 
     if (!updatedUser)
-      return ResponseDTO.error("User's secret has not been set.");
+      return ResponseDto.error("User's secret has not been set.");
 
     const sendMailResponse = await this.mailProvider.sendMail(
       email,
@@ -200,14 +200,14 @@ export class AuthService {
     return sendMailResponse;
   }
 
-  async verifyResetPassword(resetPasswordDTO: ResetPasswordDTO) {
-    const { email, token, password } = resetPasswordDTO;
+  async verifyResetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { email, token, password } = resetPasswordDto;
 
     const foundUser = await this.prismaProvider.user.findUnique({
       where: { email },
     });
 
-    if (!foundUser) return ResponseDTO.error('User not found.');
+    if (!foundUser) return ResponseDto.error('User not found.');
 
     const validatedOtpResponse = await this.otpProvider.validateOtp(
       foundUser.secret,
@@ -228,7 +228,7 @@ export class AuthService {
     });
 
     if (!updatedUser)
-      return ResponseDTO.error(
+      return ResponseDto.error(
         "User's email verification status not updated.",
         HttpStatus.EXPECTATION_FAILED,
       );

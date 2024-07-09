@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 
-export class ResponseDTO<T> {
+export class ResponseDto<T> {
   success: boolean;
   message: string;
   data?: T;
@@ -22,11 +22,11 @@ export class ResponseDTO<T> {
     message: string,
     data?: T,
     statusCode?: HttpStatus,
-  ): ResponseDTO<T> {
-    return new ResponseDTO(true, message, data, statusCode);
+  ): ResponseDto<T> {
+    return new ResponseDto(true, message, data, statusCode);
   }
 
-  static error(message: string, statusCode?: HttpStatus): ResponseDTO<null> {
-    return new ResponseDTO(false, message, null, statusCode);
+  static error(message: string, statusCode?: HttpStatus): ResponseDto<null> {
+    return new ResponseDto(false, message, null, statusCode);
   }
 }

@@ -3,11 +3,11 @@ import { ObpProvider } from 'src/providers/obp.provider';
 import { OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
 import { SmsProvider, SmsTemplate } from 'src/providers/sms.provider';
-import { ResponseDTO } from 'src/utils/response.dto';
+import { ResponseDto } from 'src/utils/response.dto';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
 
-import { AccountDTO, VerifyBvnDTO } from './dto/account.dto';
+import { AccountDto, VerifyBvnDto } from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
@@ -32,7 +32,7 @@ export class AccountService {
       where: { email },
     });
     if (!isEmailVerified)
-      return ResponseDTO.error(
+      return ResponseDto.error(
         `User's email is not verified.`,
         HttpStatus.BAD_REQUEST,
       );
@@ -45,7 +45,7 @@ export class AccountService {
     });
 
     if (!updatedUser)
-      return ResponseDTO.error(
+      return ResponseDto.error(
         "User's secret has not been set.",
         HttpStatus.BAD_REQUEST,
       );
@@ -65,16 +65,16 @@ export class AccountService {
     return sentSmsResponse;
   }
 
-  async verifyBvn(email: string, verifyBvnDTO: VerifyBvnDTO) {
+  async verifyBvn(email: string, verifyBvnDto: VerifyBvnDto) {
     const existingUserResponse = await this.prismaProvider.user.findUnique({
       where: { email },
     });
 
     if (!existingUserResponse)
-      return ResponseDTO.error('User does not exist.', HttpStatus.BAD_REQUEST);
+      return ResponseDto.error('User does not exist.', HttpStatus.BAD_REQUEST);
 
     const { secret } = existingUserResponse;
-    const { bvn, otp } = verifyBvnDTO;
+    const { bvn, otp } = verifyBvnDto;
     const isBvnVerifiedResponse = await this.otpProvider.validateOtp(
       secret,
       otp,
@@ -91,12 +91,12 @@ export class AccountService {
     });
 
     if (!updatedUser)
-      return ResponseDTO.error(
+      return ResponseDto.error(
         'User was not updated.',
         HttpStatus.EXPECTATION_FAILED,
       );
 
-    return ResponseDTO.success(
+    return ResponseDto.success(
       `User's Bvn has been updated`,
       null,
       HttpStatus.OK,
@@ -110,7 +110,7 @@ export class AccountService {
 
     const { bvn, isBvnVerified } = existingUser;
     if (!isBvnVerified)
-      return ResponseDTO.error('Bvn is not verified', HttpStatus.BAD_REQUEST);
+      return ResponseDto.error('Bvn is not verified', HttpStatus.BAD_REQUEST);
 
     const accountsLinkedToUserResponse =
       await this.obpProvider.getAccountsLinkedToUser(id, bvn);
@@ -119,7 +119,7 @@ export class AccountService {
     return accountsLinkedToUserResponse;
   }
 
-  async linkAccounts(id: string, accounts: AccountDTO[]) {
+  async linkAccounts(id: string, accounts: AccountDto[]) {
     accounts.forEach((account) => {
       account.userId = id;
     });
@@ -129,6 +129,6 @@ export class AccountService {
       skipDuplicates: true,
     });
 
-    return ResponseDTO.success('Linked user accounts.', null, HttpStatus.OK);
+    return ResponseDto.success('Linked user accounts.', null, HttpStatus.OK);
   }
 }

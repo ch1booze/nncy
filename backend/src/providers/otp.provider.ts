@@ -1,5 +1,5 @@
 import * as speakeasy from 'speakeasy';
-import { ResponseDTO } from 'src/utils/response.dto';
+import { ResponseDto } from 'src/utils/response.dto';
 
 import { Injectable } from '@nestjs/common';
 
@@ -11,7 +11,7 @@ export class OtpProvider {
       secret: secret.base32,
       encoding: 'base32',
     });
-    return ResponseDTO.success('Otp has been generated.', {
+    return ResponseDto.success('Otp has been generated.', {
       secret: secret.base32,
       token,
     });
@@ -25,7 +25,7 @@ export class OtpProvider {
       window: 25,
     });
 
-    if (!isValid) return ResponseDTO.error('Invalid Otp.');
-    return ResponseDTO.success('User is validated.');
+    if (!isValid) return ResponseDto.error('Invalid Otp.');
+    return ResponseDto.success('User is validated.');
   }
 }

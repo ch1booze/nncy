@@ -11,7 +11,7 @@ import {
 
 import { AccountStatus, AccountType } from '@prisma/client';
 
-export class AccountDTO {
+export class AccountDto {
   @IsNumberString()
   @IsNotEmpty()
   number: string;
@@ -51,13 +51,13 @@ export class AccountDTO {
   userId: string;
 }
 
-export class BvnDTO {
+export class BvnDto {
   @IsNumberString()
   @Length(10)
   bvn: string;
 }
 
-export class VerifyBvnDTO {
+export class VerifyBvnDto {
   @IsNumberString()
   @Length(10)
   bvn: string;

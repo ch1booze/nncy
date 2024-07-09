@@ -4,11 +4,11 @@ import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import {
-  EmailDTO,
-  LoginDTO,
-  ResetPasswordDTO,
-  SignupDTO,
-  TokenDTO,
+  EmailDto,
+  LoginDto,
+  ResetPasswordDto,
+  SignupDto,
+  TokenDto,
 } from './dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
@@ -17,13 +17,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  async signup(@Body() signupDTO: SignupDTO) {
-    return await this.authService.signup(signupDTO);
+  async signup(@Body() signupDto: SignupDto) {
+    return await this.authService.signup(signupDto);
   }
 
   @Post('login')
-  async login(@Body() loginDTO: LoginDTO) {
-    return await this.authService.login(loginDTO);
+  async login(@Body() loginDto: LoginDto) {
+    return await this.authService.login(loginDto);
   }
 
   @Get('get-profile')
@@ -42,20 +42,20 @@ export class AuthController {
 
   @Post('verify-email')
   @UseGuards(JwtAuthGuard)
-  async verifyEmail(@User() user: any, @Body() tokenDTO: TokenDTO) {
-    const { token } = tokenDTO;
+  async verifyEmail(@User() user: any, @Body() tokenDto: TokenDto) {
+    const { token } = tokenDto;
     const { email } = user;
     return await this.authService.verifyEmail(email, token);
   }
 
   @Get('send-reset-password-email')
-  async sendResetPasswordEmail(@Body() emailDTO: EmailDTO) {
-    const { email } = emailDTO;
+  async sendResetPasswordEmail(@Body() emailDto: EmailDto) {
+    const { email } = emailDto;
     return await this.authService.sendResetPasswordEmail(email);
   }
 
   @Patch('verify-reset-password')
-  async verifyResetPassword(@Body() resetPasswordDTO: ResetPasswordDTO) {
-    return await this.authService.verifyResetPassword(resetPasswordDTO);
+  async verifyResetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return await this.authService.verifyResetPassword(resetPasswordDto);
   }
 }

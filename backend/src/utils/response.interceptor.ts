@@ -10,9 +10,9 @@ import { Observable, map } from 'rxjs';
 export class ResponseInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      map((responseDTO) => {
+      map((responseDto) => {
         const response = context.switchToHttp().getResponse();
-        const { statusCode, ...responseBody } = responseDTO;
+        const { statusCode, ...responseBody } = responseDto;
         response.status(statusCode);
         return responseBody;
       }),

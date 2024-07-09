@@ -1,4 +1,4 @@
-import { ResponseDTO } from 'src/utils/response.dto';
+import { ResponseDto } from 'src/utils/response.dto';
 // import { Twilio } from 'twilio';
 
 import { Injectable } from '@nestjs/common';
@@ -31,7 +31,7 @@ export class SmsProvider {
         break;
 
       default:
-        return ResponseDTO.error('Sms template is invalid.');
+        return ResponseDto.error('Sms template is invalid.');
     }
 
     // const sendSmsResponse = this.smsClient.messages.create({
@@ -43,7 +43,7 @@ export class SmsProvider {
     const sendSmsResponse =
       Math.random() < 0.9 ? `${subject}:\n${message}` : null;
 
-    if (!sendSmsResponse) return ResponseDTO.error('Sms has failed to send.');
-    return ResponseDTO.success('Sent', sendSmsResponse);
+    if (!sendSmsResponse) return ResponseDto.error('Sms has failed to send.');
+    return ResponseDto.success('Sent', sendSmsResponse);
   }
 }

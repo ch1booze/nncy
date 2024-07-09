@@ -1,5 +1,5 @@
 import { createClient } from 'smtpexpress';
-import { ResponseDTO } from 'src/utils/response.dto';
+import { ResponseDto } from 'src/utils/response.dto';
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -48,7 +48,7 @@ export class MailProvider {
         break;
 
       default:
-        return ResponseDTO.error('Mail template is invalid.');
+        return ResponseDto.error('Mail template is invalid.');
     }
 
     const sendMailResponse = this.mailClient.sendApi.sendMail({
@@ -61,7 +61,7 @@ export class MailProvider {
       recipients: { name, email },
     });
 
-    if (!sendMailResponse) return ResponseDTO.error('Mail has failed to send.');
-    return ResponseDTO.success('Mail has been sent successfully.');
+    if (!sendMailResponse) return ResponseDto.error('Mail has failed to send.');
+    return ResponseDto.success('Mail has been sent successfully.');
   }
 }
