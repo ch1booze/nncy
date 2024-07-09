@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import {
   EmailDto,
   LoginDto,
+  PayloadDto,
   ResetPasswordDto,
   SignupDto,
   TokenDto,
@@ -28,21 +29,21 @@ export class AuthController {
 
   @Get('get-profile')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@User() user: any) {
+  async getProfile(@User() user: PayloadDto) {
     const { email } = user;
     return await this.authService.getProfile(email);
   }
 
   @Get('send-verification-email')
   @UseGuards(JwtAuthGuard)
-  async sendVerificationEmail(@User() user: any) {
+  async sendVerificationEmail(@User() user: PayloadDto) {
     const { email } = user;
     return await this.authService.sendVerificationEmail(email);
   }
 
   @Post('verify-email')
   @UseGuards(JwtAuthGuard)
-  async verifyEmail(@User() user: any, @Body() tokenDto: TokenDto) {
+  async verifyEmail(@User() user: PayloadDto, @Body() tokenDto: TokenDto) {
     const { token } = tokenDto;
     const { email } = user;
     return await this.authService.verifyEmail(email, token);

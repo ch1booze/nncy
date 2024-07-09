@@ -6,7 +6,6 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
-
 import { PayloadDto } from './dto';
 
 @Injectable()
@@ -23,16 +22,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(req: Request, payload: PayloadDto) {
+  async validate(req: Request) {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-    if (!token)
+    if (!token) {
       return ResponseDto.error('No token provided.', HttpStatus.UNAUTHORIZED);
+    }
 
-    const decodedToken = this.jwtService.decode(token);
-    if (!decodedToken)
+    const verifiedPayload = await this.jwtService.verifyAsync(token);
+    if (!verifiedPayload) {
       return ResponseDto.error('Invalid token.', HttpStatus.UNAUTHORIZED);
+    }
 
-    const user = { id: payload.id, email: payload.username };
+    const user: PayloadDto = verifiedPayload;
     return ResponseDto.success('User has been validated.', user, HttpStatus.OK);
   }
 }

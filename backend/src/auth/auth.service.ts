@@ -56,10 +56,7 @@ export class AuthService {
       },
     });
 
-    const payload: PayloadDto = {
-      username: newUser.email,
-      id: newUser.id,
-    };
+    const payload: PayloadDto = newUser;
 
     const signupResponse = await this.signPayload(payload);
     signupResponse.statusCode = HttpStatus.CREATED;
@@ -78,10 +75,7 @@ export class AuthService {
     }
 
     const validatedUser = validateUserResponse.data;
-    const payload: PayloadDto = {
-      username: validatedUser.email,
-      id: validatedUser.id,
-    };
+    const payload: PayloadDto = validatedUser;
 
     const loginResponse = await this.signPayload(payload);
     loginResponse.statusCode = HttpStatus.OK;

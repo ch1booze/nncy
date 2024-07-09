@@ -46,15 +46,25 @@ export class LoginDto {
 
 export class PayloadDto {
   @IsString()
-  username: string;
-
-  @IsString()
+  @IsNotEmpty()
   id: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
 }
 
 export class ProfileDto {
+  @IsEmail()
+  @IsNotEmpty()
   email: string;
+
+  @IsString()
+  @IsNotEmpty()
   firstName: string;
+
+  @IsString()
+  @IsNotEmpty()
   lastName: string;
 }
 
