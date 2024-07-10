@@ -1,31 +1,32 @@
 import * as speakeasy from 'speakeasy';
-import { ResponseDto } from 'src/utils/response.dto';
 
 import { Injectable } from '@nestjs/common';
+
+export interface OtpDto {
+  secret: string;
+  token: string;
+}
 
 @Injectable()
 export class OtpProvider {
   async generateOtp() {
-    const secret = speakeasy.generateSecret({ length: 20 });
+    const secret = speakeasy.generateSecret({ length: 20 }).base32;
     const token = speakeasy.totp({
-      secret: secret.base32,
+      secret,
       encoding: 'base32',
     });
-    return ResponseDto.success('Otp has been generated.', {
-      secret: secret.base32,
-      token,
-    });
+    return { secret, token };
   }
 
-  async validateOtp(secret: string, token: string) {
+  async validateOtp(otpDto: OtpDto) {
     const isValid = speakeasy.totp.verify({
-      secret,
-      token,
+      secret: otpDto.secret,
+      token: otpDto.token,
       encoding: 'base32',
       window: 25,
     });
 
-    if (!isValid) return ResponseDto.error('Invalid Otp.');
-    return ResponseDto.success('User is validated.');
+    if (!isValid) return false;
+    return true;
   }
 }

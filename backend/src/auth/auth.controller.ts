@@ -3,7 +3,7 @@ import { User } from 'src/utils/user.decorator';
 import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import {
+import type {
   EmailDto,
   LoginDto,
   PayloadDto,
@@ -30,29 +30,24 @@ export class AuthController {
   @Get('get-profile')
   @UseGuards(JwtAuthGuard)
   async getProfile(@User() user: PayloadDto) {
-    const { email } = user;
-    return await this.authService.getProfile(email);
+    return await this.authService.getProfile(user);
   }
 
   @Get('send-verification-email')
   @UseGuards(JwtAuthGuard)
   async sendVerificationEmail(@User() user: PayloadDto) {
-    const { email } = user;
-    return await this.authService.sendVerificationEmail(email);
+    return await this.authService.sendVerificationEmail(user);
   }
 
   @Post('verify-email')
   @UseGuards(JwtAuthGuard)
   async verifyEmail(@User() user: PayloadDto, @Body() tokenDto: TokenDto) {
-    const { token } = tokenDto;
-    const { email } = user;
-    return await this.authService.verifyEmail(email, token);
+    return await this.authService.verifyEmail(user, tokenDto);
   }
 
   @Get('send-reset-password-email')
   async sendResetPasswordEmail(@Body() emailDto: EmailDto) {
-    const { email } = emailDto;
-    return await this.authService.sendResetPasswordEmail(email);
+    return await this.authService.sendResetPasswordEmail(emailDto);
   }
 
   @Patch('verify-reset-password')

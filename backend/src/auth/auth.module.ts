@@ -1,4 +1,4 @@
-import { MailProvider } from 'src/providers/mail.provider';
+import { EmailProvider } from 'src/providers/email.provider';
 import { ObpProvider } from 'src/providers/obp.provider';
 import { OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
@@ -30,7 +30,7 @@ import { JwtStrategy } from './jwt.strategy';
     AuthService,
     JwtStrategy,
     PrismaProvider,
-    MailProvider,
+    EmailProvider,
     OtpProvider,
     ObpProvider,
   ],

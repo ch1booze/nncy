@@ -1,32 +1,23 @@
 import { HttpStatus } from '@nestjs/common';
 
+import { ResponseType } from './response.types';
+
 export class ResponseDto<T> {
-  success: boolean;
+  status: HttpStatus;
   message: string;
   data?: T;
-  statusCode?: HttpStatus;
 
-  constructor(
-    success: boolean,
-    message: string,
-    data?: T,
-    statusCode?: HttpStatus,
-  ) {
-    this.success = success;
+  constructor(responseType: ResponseType, data?: T) {
+    const { status, message } = responseType;
+    this.status = status;
     this.message = message;
     this.data = data;
-    this.statusCode = statusCode;
   }
 
-  static success<T>(
-    message: string,
+  static generateResponse<T>(
+    responseType: ResponseType,
     data?: T,
-    statusCode?: HttpStatus,
   ): ResponseDto<T> {
-    return new ResponseDto(true, message, data, statusCode);
-  }
-
-  static error(message: string, statusCode?: HttpStatus): ResponseDto<null> {
-    return new ResponseDto(false, message, null, statusCode);
+    return new ResponseDto(responseType, data);
   }
 }

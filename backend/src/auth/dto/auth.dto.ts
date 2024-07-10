@@ -48,10 +48,6 @@ export class PayloadDto {
   @IsString()
   @IsNotEmpty()
   id: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
 }
 
 export class ProfileDto {

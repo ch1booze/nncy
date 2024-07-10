@@ -1,13 +1,28 @@
-import { BvnProvider } from 'src/providers/bvn.provider';
+import { PayloadDto } from 'src/auth/dto';
+import { BvnProvider, PhoneDto } from 'src/providers/bvn.provider';
 import { ObpProvider } from 'src/providers/obp.provider';
-import { OtpProvider } from 'src/providers/otp.provider';
+import { OtpDto, OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
-import { SmsProvider, SmsTemplate } from 'src/providers/sms.provider';
+import {
+  SendSmsDto,
+  SmsProvider,
+  SmsTemplate,
+} from 'src/providers/sms.provider';
 import { ResponseDto } from 'src/utils/response.dto';
+import {
+  ACCOUNTS_ARE_LINKED,
+  ACCOUNTS_ARE_RETRIEVED,
+  BVN_IS_VERIFIED,
+  BVN_NOT_VERIFIED,
+  EMAIL_NOT_VERIFIED,
+  OTP_NOT_VALID,
+  SMS_IS_SENT,
+  USER_NOT_FOUND,
+} from 'src/utils/response.types';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
-import { AccountDto, VerifyBvnDto } from './dto/account.dto';
+import { AccountDto, BvnDto, VerifyBvnDto } from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
@@ -19,116 +34,99 @@ export class AccountService {
     private otpProvider: OtpProvider,
   ) {}
 
-  async sendBvnVerification(email: string, bvn: string) {
-    const isVerifiedBvnResponse =
-      await this.bvnProvider.getPhoneLinkedToBvn(bvn);
-    if (!isVerifiedBvnResponse.success) {
-      isVerifiedBvnResponse.statusCode = HttpStatus.BAD_REQUEST;
-      return isVerifiedBvnResponse;
-    }
-    const phoneLinkedToBvn = isVerifiedBvnResponse.data;
-
-    const { isEmailVerified } = await this.prismaProvider.user.findUnique({
-      where: { email },
+  async sendBvnVerification(user: PayloadDto, bvnDto: BvnDto) {
+    const foundUser = await this.prismaProvider.user.findUnique({
+      where: { id: user.id },
     });
-    if (!isEmailVerified)
-      return ResponseDto.error(
-        `User's email is not verified.`,
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!foundUser.isEmailVerified) {
+      return ResponseDto.generateResponse(EMAIL_NOT_VERIFIED);
+    }
 
-    const generatedOtpResponse = await this.otpProvider.generateOtp();
-    const { secret, token } = generatedOtpResponse.data;
+    const phoneDto: PhoneDto =
+      await this.bvnProvider.getPhoneLinkedToBvn(bvnDto);
+    const otpDto: OtpDto = await this.otpProvider.generateOtp();
     const updatedUser = await this.prismaProvider.user.update({
-      where: { email },
-      data: { secret },
+      where: { id: foundUser.id },
+      data: { secret: otpDto.secret },
     });
-
-    if (!updatedUser)
-      return ResponseDto.error(
-        "User's secret has not been set.",
-        HttpStatus.BAD_REQUEST,
-      );
-
-    const sentSmsResponse = await this.smsProvider.sendSms(
-      phoneLinkedToBvn,
-      token,
-      SmsTemplate.Bvn_VERIFICATION,
-    );
-
-    if (!sentSmsResponse.success) {
-      sentSmsResponse.statusCode = HttpStatus.BAD_REQUEST;
-      return sentSmsResponse;
+    if (!updatedUser) {
+      throw new InternalServerErrorException('User not updated');
     }
 
-    sentSmsResponse.statusCode = HttpStatus.OK;
-    return sentSmsResponse;
+    const sendSmsDto: SendSmsDto = {
+      name: `${foundUser.firstName} ${foundUser.lastName}`,
+      phone: phoneDto.phone,
+      token: otpDto.token,
+      smsTemplate: SmsTemplate.BVN_VERIFICATION,
+    };
+    const sentSms = await this.smsProvider.sendSms(sendSmsDto);
+
+    return ResponseDto.generateResponse(SMS_IS_SENT, sentSms);
   }
 
-  async verifyBvn(email: string, verifyBvnDto: VerifyBvnDto) {
-    const existingUserResponse = await this.prismaProvider.user.findUnique({
-      where: { email },
+  async verifyBvn(user: PayloadDto, verifyBvnDto: VerifyBvnDto) {
+    const foundUser = await this.prismaProvider.user.findUnique({
+      where: { id: user.id },
     });
+    if (!foundUser) {
+      return ResponseDto.generateResponse(USER_NOT_FOUND);
+    }
 
-    if (!existingUserResponse)
-      return ResponseDto.error('User does not exist.', HttpStatus.BAD_REQUEST);
-
-    const { secret } = existingUserResponse;
-    const { bvn, otp } = verifyBvnDto;
-    const isBvnVerifiedResponse = await this.otpProvider.validateOtp(
-      secret,
-      otp,
-    );
-
-    if (!isBvnVerifiedResponse.success) {
-      isBvnVerifiedResponse.statusCode = HttpStatus.BAD_REQUEST;
-      return isBvnVerifiedResponse;
+    const otpDto: OtpDto = {
+      secret: foundUser.secret,
+      token: verifyBvnDto.token,
+    };
+    const isValidatedOtp = await this.otpProvider.validateOtp(otpDto);
+    if (!isValidatedOtp) {
+      return ResponseDto.generateResponse(OTP_NOT_VALID);
     }
 
     const updatedUser = await this.prismaProvider.user.update({
-      where: { email },
-      data: { bvn, isBvnVerified: true },
+      where: { id: user.id },
+      data: { bvn: verifyBvnDto.bvn, isEmailVerified: true },
     });
+    if (!updatedUser) {
+      throw new InternalServerErrorException('User not updated');
+    }
 
-    if (!updatedUser)
-      return ResponseDto.error(
-        'User was not updated.',
-        HttpStatus.EXPECTATION_FAILED,
-      );
+    return ResponseDto.generateResponse(BVN_IS_VERIFIED);
+  }
 
-    return ResponseDto.success(
-      `User's Bvn has been updated`,
-      null,
-      HttpStatus.OK,
+  async getAccountsLinkedToUser(user: PayloadDto) {
+    const foundUser = await this.prismaProvider.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!foundUser.isBvnVerified) {
+      return ResponseDto.generateResponse(BVN_NOT_VERIFIED);
+    }
+
+    const accountsLinkedToUser = await this.obpProvider.getAccountsLinkedToUser(
+      user.id,
+      foundUser.bvn,
+    );
+
+    return ResponseDto.generateResponse(
+      ACCOUNTS_ARE_RETRIEVED,
+      accountsLinkedToUser,
     );
   }
 
-  async getAccountsLinkedToUser(id: string) {
-    const existingUser = await this.prismaProvider.user.findUnique({
-      where: { id },
+  async linkAccounts(user: PayloadDto, accounts: AccountDto[]) {
+    const foundUser = await this.prismaProvider.user.findUnique({
+      where: { id: user.id },
     });
+    if (!foundUser) {
+      return ResponseDto.generateResponse(USER_NOT_FOUND);
+    }
 
-    const { bvn, isBvnVerified } = existingUser;
-    if (!isBvnVerified)
-      return ResponseDto.error('Bvn is not verified', HttpStatus.BAD_REQUEST);
-
-    const accountsLinkedToUserResponse =
-      await this.obpProvider.getAccountsLinkedToUser(id, bvn);
-
-    accountsLinkedToUserResponse.statusCode = HttpStatus.OK;
-    return accountsLinkedToUserResponse;
-  }
-
-  async linkAccounts(id: string, accounts: AccountDto[]) {
-    accounts.forEach((account) => {
-      account.userId = id;
-    });
-
-    await this.prismaProvider.account.createMany({
+    const createdManyAccounts = await this.prismaProvider.account.createMany({
       data: accounts,
       skipDuplicates: true,
     });
+    if (!createdManyAccounts) {
+      throw new InternalServerErrorException('Accounts not created');
+    }
 
-    return ResponseDto.success('Linked user accounts.', null, HttpStatus.OK);
+    return ResponseDto.generateResponse(ACCOUNTS_ARE_LINKED);
   }
 }

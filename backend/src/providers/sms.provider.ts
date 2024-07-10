@@ -1,11 +1,20 @@
-import { ResponseDto } from 'src/utils/response.dto';
 // import { Twilio } from 'twilio';
-
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  // InternalServerErrorException,
+  NotImplementedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 export enum SmsTemplate {
-  Bvn_VERIFICATION = 'bvn-verification',
+  BVN_VERIFICATION,
+}
+
+export interface SendSmsDto {
+  phone: string;
+  name: string;
+  token: string;
+  smsTemplate: SmsTemplate;
 }
 
 @Injectable()
@@ -15,35 +24,35 @@ export class SmsProvider {
 
   constructor(private configService: ConfigService) {
     // this.senderPhone = this.configService.get<string>('TWILIO_SENDER_PHONE');
-    // const accountSID = this.configService.get<string>('TWILIO_ACCOUNT_SID');
+    // const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
     // const authToken = this.configService.get<string>('TWILIO_TEST_AUTH_TOKEN');
-    // this.smsClient = new Twilio(accountSID, authToken);
+    // this.smsClient = new Twilio(accountSid, authToken);
   }
 
-  async sendSms(phone: string, token: string, smsTemplate: SmsTemplate) {
+  async sendSms(sendSmsDto: SendSmsDto) {
     let subject;
     let message;
 
-    switch (smsTemplate) {
-      case SmsTemplate.Bvn_VERIFICATION:
-        subject = 'Bvn Verification';
-        message = `Your Otp Code: ${token}`;
+    switch (sendSmsDto.smsTemplate) {
+      case SmsTemplate.BVN_VERIFICATION:
+        subject = 'BVN Verification';
+        message = `Your Otp Code: ${sendSmsDto.token}`;
         break;
 
       default:
-        return ResponseDto.error('Sms template is invalid.');
+        throw new NotImplementedException('SMS template not implemented');
     }
 
-    // const sendSmsResponse = this.smsClient.messages.create({
-    //   body: `${subject}:\n${message}`,
-    //   from: this.senderPhone,
-    //   to: phone,
-    // });
+    // try {
+    //   this.smsClient.messages.create({
+    //     body: `${subject}:\n${message}`,
+    //     from: this.senderPhone,
+    //     to: sendSmsDto.phone,
+    //   });
+    // } catch (error) {
+    //   throw new InternalServerErrorException(error.message);
+    // }
 
-    const sendSmsResponse =
-      Math.random() < 0.9 ? `${subject}:\n${message}` : null;
-
-    if (!sendSmsResponse) return ResponseDto.error('Sms has failed to send.');
-    return ResponseDto.success('Sent', sendSmsResponse);
+    return `${subject} to ${sendSmsDto.name}:\n${message}`;
   }
 }

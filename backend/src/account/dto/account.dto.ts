@@ -64,5 +64,5 @@ export class VerifyBvnDto {
 
   @IsNumberString()
   @Length(6)
-  otp: string;
+  token: string;
 }
