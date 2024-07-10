@@ -8,7 +8,7 @@ import {
   ACCOUNT_NOT_FOUND,
 } from 'src/utils/response.types';
 
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { TransactionType } from '@prisma/client';
 
 import { ExpenseDto } from './dto';
@@ -40,24 +40,18 @@ export class TransactionService {
     }
 
     const newBalance = accountBalance.subtract(expense);
-    const updatedAccount = await this.prismaProvider.account.update({
+    await this.prismaProvider.account.update({
       where: { number: expenseDto.accountNumber },
       data: { balance: newBalance.getAmount() },
     });
-    if (!updatedAccount) {
-      throw new InternalServerErrorException('Account not updated');
-    }
 
-    const createdTransaction = await this.prismaProvider.transaction.create({
+    await this.prismaProvider.transaction.create({
       data: {
         ...expenseDto,
         type: TransactionType.Outflow,
         userId: user.id,
       },
     });
-    if (!createdTransaction) {
-      throw new InternalServerErrorException('Transaction not created');
-    }
 
     return ResponseDto.generateResponse(ACCOUNT_IS_EXPENDED);
   }

@@ -43,15 +43,11 @@ export class SmsProvider {
         throw new NotImplementedException('SMS template not implemented');
     }
 
-    // try {
-    //   this.smsClient.messages.create({
-    //     body: `${subject}:\n${message}`,
-    //     from: this.senderPhone,
-    //     to: sendSmsDto.phone,
-    //   });
-    // } catch (error) {
-    //   throw new InternalServerErrorException(error.message);
-    // }
+    // this.smsClient.messages.create({
+    //   body: `${subject}:\n${message}`,
+    //   from: this.senderPhone,
+    //   to: sendSmsDto.phone,
+    // });
 
     return `${subject} to ${sendSmsDto.name}:\n${message}`;
   }

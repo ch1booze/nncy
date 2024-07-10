@@ -20,7 +20,7 @@ import {
   USER_NOT_FOUND,
 } from 'src/utils/response.types';
 
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { AccountDto, BvnDto, VerifyBvnDto } from './dto/account.dto';
 
@@ -45,13 +45,10 @@ export class AccountService {
     const phoneDto: PhoneDto =
       await this.bvnProvider.getPhoneLinkedToBvn(bvnDto);
     const otpDto: OtpDto = await this.otpProvider.generateOtp();
-    const updatedUser = await this.prismaProvider.user.update({
+    await this.prismaProvider.user.update({
       where: { id: foundUser.id },
       data: { secret: otpDto.secret },
     });
-    if (!updatedUser) {
-      throw new InternalServerErrorException('User not updated');
-    }
 
     const sendSmsDto: SendSmsDto = {
       name: `${foundUser.firstName} ${foundUser.lastName}`,
@@ -81,13 +78,10 @@ export class AccountService {
       return ResponseDto.generateResponse(OTP_NOT_VALID);
     }
 
-    const updatedUser = await this.prismaProvider.user.update({
+    await this.prismaProvider.user.update({
       where: { id: user.id },
       data: { bvn: verifyBvnDto.bvn, isEmailVerified: true },
     });
-    if (!updatedUser) {
-      throw new InternalServerErrorException('User not updated');
-    }
 
     return ResponseDto.generateResponse(BVN_IS_VERIFIED);
   }
@@ -119,13 +113,10 @@ export class AccountService {
       return ResponseDto.generateResponse(USER_NOT_FOUND);
     }
 
-    const createdManyAccounts = await this.prismaProvider.account.createMany({
+    await this.prismaProvider.account.createMany({
       data: accounts,
       skipDuplicates: true,
     });
-    if (!createdManyAccounts) {
-      throw new InternalServerErrorException('Accounts not created');
-    }
 
     return ResponseDto.generateResponse(ACCOUNTS_ARE_LINKED);
   }

@@ -1,10 +1,6 @@
 import { createClient } from 'smtpexpress';
 
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotImplementedException,
-} from '@nestjs/common';
+import { Injectable, NotImplementedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 export enum EmailTemplate {
@@ -56,20 +52,14 @@ export class EmailProvider {
         throw new NotImplementedException('Mail template not implemented');
     }
 
-    try {
-      this.emailClient.sendApi.sendEmail({
-        subject,
-        message,
-        sender: {
-          name: 'Nancy',
-          email: this.senderEmail,
-        },
-        recipients: { name: sendEmailDto.name, email: sendEmailDto.email },
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-
-    return true;
+    this.emailClient.sendApi.sendEmail({
+      subject,
+      message,
+      sender: {
+        name: 'Nancy',
+        email: this.senderEmail,
+      },
+      recipients: { name: sendEmailDto.name, email: sendEmailDto.email },
+    });
   }
 }

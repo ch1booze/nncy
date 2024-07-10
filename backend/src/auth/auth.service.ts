@@ -19,7 +19,7 @@ import {
   USER_PROFILE_IS_RETRIEVED,
 } from 'src/utils/response.types';
 
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import type {
@@ -56,10 +56,6 @@ export class AuthService {
         password: hashedPassword,
       },
     });
-
-    if (!createdUser) {
-      throw new InternalServerErrorException('User not created');
-    }
 
     const loginDto: LoginDto = createdUser;
     return await this.login(loginDto);
@@ -111,9 +107,6 @@ export class AuthService {
       where: { id: foundUser.id },
       data: { secret: otpDto.secret },
     });
-    if (!updatedUser) {
-      throw new InternalServerErrorException('User not updated');
-    }
 
     const sendEmailDto: SendEmailDto = {
       name: `${foundUser.firstName} ${foundUser.lastName}`,
@@ -121,12 +114,8 @@ export class AuthService {
       token: otpDto.token,
       emailTemplate: EmailTemplate.VERIFICATION,
     };
-    const isSentMail = await this.emailProvider.sendEmail(sendEmailDto);
 
-    if (!isSentMail) {
-      throw new InternalServerErrorException('Mail not sent');
-    }
-
+    await this.emailProvider.sendEmail(sendEmailDto);
     return ResponseDto.generateResponse(EMAIL_IS_SENT);
   }
 
@@ -144,14 +133,10 @@ export class AuthService {
       return ResponseDto.generateResponse(OTP_NOT_VALID);
     }
 
-    const updatedUser = await this.prismaProvider.user.update({
+    await this.prismaProvider.user.update({
       where: { id: user.id },
       data: { isEmailVerified: true },
     });
-    if (!updatedUser) {
-      throw new InternalServerErrorException('User not updated');
-    }
-
     return ResponseDto.generateResponse(EMAIL_IS_VERIFIED);
   }
 
@@ -168,9 +153,6 @@ export class AuthService {
       where: { id: foundUser.id },
       data: { secret: otpDto.secret },
     });
-    if (!updatedUser) {
-      throw new InternalServerErrorException('User not updated');
-    }
 
     const sendEmailDto: SendEmailDto = {
       name: `${foundUser.firstName} ${foundUser.lastName}`,
@@ -178,11 +160,8 @@ export class AuthService {
       token: otpDto.token,
       emailTemplate: EmailTemplate.RESET_PASSWORD,
     };
-    const isSentMail = await this.emailProvider.sendEmail(sendEmailDto);
-    if (!isSentMail) {
-      throw new InternalServerErrorException('Mail not sent');
-    }
 
+    await this.emailProvider.sendEmail(sendEmailDto);
     return ResponseDto.generateResponse(EMAIL_IS_SENT);
   }
 
@@ -204,13 +183,10 @@ export class AuthService {
     }
 
     const hashedPassword = await argon2.hash(resetPasswordDto.password);
-    const updatedUser = await this.prismaProvider.user.update({
+    await this.prismaProvider.user.update({
       where: { email: resetPasswordDto.email },
       data: { password: hashedPassword },
     });
-    if (!updatedUser) {
-      throw new InternalServerErrorException('User not updated');
-    }
 
     return ResponseDto.generateResponse(PASSWORD_IS_RESET);
   }
