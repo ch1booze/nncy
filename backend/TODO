@@ -5,12 +5,10 @@ Done:
     ✔ Create account resource. @done(24-07-03 11:16)
     ✔ Implement a response interceptor. @done(24-07-03 19:28)
     ✔ Add validation and confirm password matching to password. @done(24-07-04 10:28)
+    ✔ Implement account resource. @done(24-07-10 15:24)
+    ✔ Abstract Otp generation so it is applicable easily to the resetting of password. @done(24-07-10 15:24)
 
 ToDo:
-    ☐ Implement account resource.
-    ☐ Abstract Otp generation so it is applicable easily to the resetting of password.
     ☐ Implement testing framework.
-    ☐ Implement a logger service to logging invalid responses (i.e. responses not of type ResponsDto).
+    ☐ Implement a logger service to log exceptions.
     ☐ Look into how banks ensure security of sensitive information.
-    ☐ Decide on commenting and return types strategy.
-    ☐ Investigate slowness in response time.
