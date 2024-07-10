@@ -2,9 +2,9 @@ import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ResponseDto } from 'src/utils/response.dto';
 import {
+  TOKEN_NOT_FOUND,
   USER_IS_AUTHORIZED,
   USER_NOT_AUTHORIZED,
-  USER_NOT_FOUND,
 } from 'src/utils/response.types';
 
 import { Injectable } from '@nestjs/common';
@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(req: Request) {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
     if (!token) {
-      return ResponseDto.generateResponse(USER_NOT_FOUND);
+      return ResponseDto.generateResponse(TOKEN_NOT_FOUND);
     }
 
     const verifiedPayload = await this.jwtService.verifyAsync(token);

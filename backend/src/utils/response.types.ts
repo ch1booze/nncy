@@ -120,3 +120,8 @@ export const ACCOUNT_IS_EXPENDED: ResponseType = {
   status: HttpStatus.OK,
   message: 'Account is expended',
 };
+
+export const TOKEN_NOT_FOUND: ResponseType = {
+  status: HttpStatus.BAD_REQUEST,
+  message: 'Token not found',
+};
