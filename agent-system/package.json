@@ -1,0 +1,19 @@
+{
+  "name": "agent-system",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@langchain/groq": "^0.0.13",
+    "@langchain/langgraph": "^0.0.26",
+    "dotenv": "^16.4.5",
+    "esrun": "^3.2.26",
+    "langchain": "^0.2.9",
+    "zod": "^3.23.8"
+  }
+}
