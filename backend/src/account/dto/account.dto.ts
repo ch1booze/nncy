@@ -66,3 +66,10 @@ export class VerifyBvnDto {
   @Length(6)
   token: string;
 }
+
+export const accountSummary = {
+  bankName: true,
+  balance: true,
+  number: true,
+  currency: true,
+};

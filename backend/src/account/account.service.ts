@@ -24,7 +24,12 @@ import {
 
 import { Injectable } from '@nestjs/common';
 
-import { AccountDto, BvnDto, VerifyBvnDto } from './dto/account.dto';
+import {
+  AccountDto,
+  accountSummary,
+  BvnDto,
+  VerifyBvnDto,
+} from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
@@ -123,7 +128,7 @@ export class AccountService {
     return ResponseDto.generateResponse(ACCOUNTS_ARE_LINKED);
   }
 
-  async getAccounts(user: PayloadDto) {
+  async getAccountsSummary(user: PayloadDto) {
     const foundUser = await this.prismaProvider.user.findUnique({
       where: { id: user.id },
     });
@@ -133,12 +138,13 @@ export class AccountService {
 
     const foundAccounts = await this.prismaProvider.account.findMany({
       where: { userId: user.id },
+      select: accountSummary,
     });
 
     return ResponseDto.generateResponse(ACCOUNTS_ARE_RETRIEVED, foundAccounts);
   }
 
-  async getAccountById(user: PayloadDto, id: number) {
+  async getAccountById(user: PayloadDto, index: number) {
     const foundUser = await this.prismaProvider.user.findUnique({
       where: { id: user.id },
     });
@@ -146,13 +152,12 @@ export class AccountService {
       return ResponseDto.generateResponse(USER_NOT_FOUND);
     }
 
-    const foundAccounts = await this.prismaProvider.account.findMany({
+    const foundAccount = await this.prismaProvider.account.findFirst({
       where: { userId: user.id },
+      skip: index,
+      take: 1,
     });
 
-    return ResponseDto.generateResponse(
-      ACCOUNT_IS_RETRIEVED,
-      foundAccounts[id],
-    );
+    return ResponseDto.generateResponse(ACCOUNT_IS_RETRIEVED, foundAccount);
   }
 }

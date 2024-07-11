@@ -107,6 +107,12 @@ export const TOKEN_NOT_FOUND: ResponseType = {
   message: 'Token not found',
 };
 
+// Transaction
+export const TRANSACTIONS_ARE_RETRIEVED: ResponseType = {
+  status: HttpStatus.OK,
+  message: 'Transactions are retrieved',
+};
+
 // User
 export const USER_IS_AUTHORIZED: ResponseType = {
   status: HttpStatus.OK,

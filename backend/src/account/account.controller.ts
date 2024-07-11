@@ -46,14 +46,14 @@ export class AccountController {
 
   @Get('get-accounts')
   async getAccounts(@User() user: PayloadDto) {
-    return await this.accountService.getAccounts(user);
+    return await this.accountService.getAccountsSummary(user);
   }
 
-  @Get('get-account/:id')
-  async getAccountById(
+  @Get('get-account/:index')
+  async getAccountByIndex(
     @User() user: PayloadDto,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('index', ParseIntPipe) index: number,
   ) {
-    return await this.accountService.getAccountById(user, id);
+    return await this.accountService.getAccountById(user, index);
   }
 }
