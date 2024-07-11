@@ -97,7 +97,7 @@ export const PASSWORD_NOT_RESET: ResponseType = {
 
 // SMS
 export const SMS_IS_SENT: ResponseType = {
-  status: HttpStatus.BAD_REQUEST,
+  status: HttpStatus.OK,
   message: 'SMS is sent',
 };
 

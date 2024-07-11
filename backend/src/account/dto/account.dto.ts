@@ -57,16 +57,6 @@ export class BvnDto {
   bvn: string;
 }
 
-export class VerifyBvnDto {
-  @IsNumberString()
-  @Length(10)
-  bvn: string;
-
-  @IsNumberString()
-  @Length(6)
-  token: string;
-}
-
 export const accountSummary = {
   bankName: true,
   balance: true,

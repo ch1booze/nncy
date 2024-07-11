@@ -1,4 +1,4 @@
-import * as Dinero from 'dinero.js';
+import Dinero from 'dinero.js';
 import * as seedrandom from 'seedrandom';
 import { AccountDto } from 'src/account/dto/account.dto';
 
@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { AccountStatus, AccountType } from '@prisma/client';
 
 @Injectable()
-export class ObpProvider {
+export class BankingProvider {
   static NUMBER_OF_ACCOUNTS = 3;
   static ACCOUNT_TYPES: AccountType[] = ['Current', 'Fixed', 'Savings'];
   static BANK_NAMES = [
@@ -31,18 +31,18 @@ export class ObpProvider {
     seedrandom(Number(bvn));
 
     const accountsLinkedToUser: AccountDto[] = [];
-    for (let i = 0; i < ObpProvider.NUMBER_OF_ACCOUNTS; i++) {
+    for (let i = 0; i < BankingProvider.NUMBER_OF_ACCOUNTS; i++) {
       const type: AccountType = faker.helpers.arrayElement(
-        ObpProvider.ACCOUNT_TYPES,
+        BankingProvider.ACCOUNT_TYPES,
       );
-      const bankName = faker.helpers.arrayElement(ObpProvider.BANK_NAMES);
+      const bankName = faker.helpers.arrayElement(BankingProvider.BANK_NAMES);
       const status: AccountStatus = Math.random() < 0.9 ? 'Active' : 'Dormant';
       const balance = Dinero({
         amount: parseInt(
           faker.finance.amount({ min: 100000, max: 1000000 }),
           10,
         ),
-        currency: ObpProvider.CURRENCY,
+        currency: BankingProvider.CURRENCY,
       }).getAmount();
 
       const account: AccountDto = {
@@ -51,7 +51,7 @@ export class ObpProvider {
         balance,
         bankName,
         type,
-        currency: ObpProvider.CURRENCY,
+        currency: BankingProvider.CURRENCY,
         status,
         userId: id,
       };

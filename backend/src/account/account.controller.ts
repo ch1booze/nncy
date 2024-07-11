@@ -1,4 +1,4 @@
-import { PayloadDto } from 'src/auth/dto';
+import { PayloadDto, TokenDto } from 'src/auth/dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/utils/user.decorator';
 
@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 
 import { AccountService } from './account.service';
-import { AccountDto, BvnDto, VerifyBvnDto } from './dto/account.dto';
+import { AccountDto, BvnDto } from './dto/account.dto';
 
 @Controller('account')
 @UseGuards(JwtAuthGuard)
@@ -27,11 +27,8 @@ export class AccountController {
   }
 
   @Post('verify-bvn')
-  async verifyBvn(
-    @User() user: PayloadDto,
-    @Body() verifyBvnDto: VerifyBvnDto,
-  ) {
-    return await this.accountService.verifyBvn(user, verifyBvnDto);
+  async verifyBvn(@User() user: PayloadDto, @Body() tokenDto: TokenDto) {
+    return await this.accountService.verifyBvn(user, tokenDto);
   }
 
   @Get('get-accounts-linked-to-user')

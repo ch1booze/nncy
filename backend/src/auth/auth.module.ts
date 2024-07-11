@@ -1,5 +1,5 @@
 import { EmailProvider } from 'src/providers/email.provider';
-import { ObpProvider } from 'src/providers/obp.provider';
+import { BankingProvider } from 'src/providers/banking.provider';
 import { OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
 
@@ -32,7 +32,7 @@ import { JwtStrategy } from './jwt.strategy';
     PrismaProvider,
     EmailProvider,
     OtpProvider,
-    ObpProvider,
+    BankingProvider,
   ],
 })
 export class AuthModule {}

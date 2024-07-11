@@ -52,7 +52,7 @@ export class EmailProvider {
         throw new NotImplementedException('Mail template not implemented');
     }
 
-    this.emailClient.sendApi.sendEmail({
+    this.emailClient.sendApi.sendMail({
       subject,
       message,
       sender: {

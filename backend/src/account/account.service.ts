@@ -1,6 +1,6 @@
-import { PayloadDto } from 'src/auth/dto';
+import { PayloadDto, TokenDto } from 'src/auth/dto';
 import { BvnProvider, PhoneDto } from 'src/providers/bvn.provider';
-import { ObpProvider } from 'src/providers/obp.provider';
+import { BankingProvider } from 'src/providers/banking.provider';
 import { OtpDto, OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
 import {
@@ -24,17 +24,12 @@ import {
 
 import { Injectable } from '@nestjs/common';
 
-import {
-  AccountDto,
-  accountSummary,
-  BvnDto,
-  VerifyBvnDto,
-} from './dto/account.dto';
+import { AccountDto, accountSummary, BvnDto } from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
   constructor(
-    private obpProvider: ObpProvider,
+    private bankingProvider: BankingProvider,
     private prismaProvider: PrismaProvider,
     private smsProvider: SmsProvider,
     private bvnProvider: BvnProvider,
@@ -53,7 +48,7 @@ export class AccountService {
       await this.bvnProvider.getPhoneLinkedToBvn(bvnDto);
     const otpDto: OtpDto = await this.otpProvider.generateOtp();
     await this.prismaProvider.user.update({
-      where: { id: foundUser.id },
+      where: { id: user.id },
       data: { secret: otpDto.secret },
     });
 
@@ -68,7 +63,7 @@ export class AccountService {
     return ResponseDto.generateResponse(SMS_IS_SENT, sentSms);
   }
 
-  async verifyBvn(user: PayloadDto, verifyBvnDto: VerifyBvnDto) {
+  async verifyBvn(user: PayloadDto, tokenDto: TokenDto) {
     const foundUser = await this.prismaProvider.user.findUnique({
       where: { id: user.id },
     });
@@ -78,7 +73,7 @@ export class AccountService {
 
     const otpDto: OtpDto = {
       secret: foundUser.secret,
-      token: verifyBvnDto.token,
+      token: tokenDto.token,
     };
     const isValidatedOtp = await this.otpProvider.validateOtp(otpDto);
     if (!isValidatedOtp) {
@@ -87,7 +82,7 @@ export class AccountService {
 
     await this.prismaProvider.user.update({
       where: { id: user.id },
-      data: { bvn: verifyBvnDto.bvn, isEmailVerified: true },
+      data: { isBvnVerified: true },
     });
 
     return ResponseDto.generateResponse(BVN_IS_VERIFIED);
@@ -101,10 +96,11 @@ export class AccountService {
       return ResponseDto.generateResponse(BVN_NOT_VERIFIED);
     }
 
-    const accountsLinkedToUser = await this.obpProvider.getAccountsLinkedToUser(
-      user.id,
-      foundUser.bvn,
-    );
+    const accountsLinkedToUser =
+      await this.bankingProvider.getAccountsLinkedToUser(
+        user.id,
+        foundUser.bvn,
+      );
 
     return ResponseDto.generateResponse(
       LINKED_ACCOUNTS_ARE_RETRIEVED,

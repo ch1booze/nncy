@@ -1,5 +1,5 @@
 import { BvnProvider } from 'src/providers/bvn.provider';
-import { ObpProvider } from 'src/providers/obp.provider';
+import { BankingProvider } from 'src/providers/banking.provider';
 import { OtpProvider } from 'src/providers/otp.provider';
 import { PrismaProvider } from 'src/providers/prisma.provider';
 import { SmsProvider } from 'src/providers/sms.provider';
@@ -13,7 +13,7 @@ import { AccountService } from './account.service';
   controllers: [AccountController],
   providers: [
     AccountService,
-    ObpProvider,
+    BankingProvider,
     PrismaProvider,
     OtpProvider,
     SmsProvider,

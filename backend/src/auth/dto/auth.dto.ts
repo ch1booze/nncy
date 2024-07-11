@@ -50,19 +50,14 @@ export class PayloadDto {
   id: string;
 }
 
-export class ProfileDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  firstName: string;
-
-  @IsString()
-  @IsNotEmpty()
-  lastName: string;
-}
+export const profileInclusionFields = {
+  email: true,
+  firstName: true,
+  lastName: true,
+  isEmailVerified: true,
+  isBvnVerified: true,
+  dateOfBirth: true,
+};
 
 export class EmailDto {
   @IsEmail()

@@ -22,14 +22,14 @@ import {
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import type {
-  EmailDto,
-  LoginDto,
-  PayloadDto,
-  ProfileDto,
-  ResetPasswordDto,
-  SignupDto,
-  TokenDto,
+import {
+  profileInclusionFields,
+  type EmailDto,
+  type LoginDto,
+  type PayloadDto,
+  type ResetPasswordDto,
+  type SignupDto,
+  type TokenDto,
 } from './dto';
 
 @Injectable()
@@ -40,6 +40,11 @@ export class AuthService {
     private emailProvider: EmailProvider,
     private otpProvider: OtpProvider,
   ) {}
+
+  private async authorizeUser(payload: PayloadDto) {
+    const accessToken = await this.jwtService.signAsync(payload);
+    return ResponseDto.generateResponse(USER_IS_AUTHORIZED, accessToken);
+  }
 
   async signup(signupDto: SignupDto) {
     const foundUser = await this.prismaProvider.user.findUnique({
@@ -57,8 +62,8 @@ export class AuthService {
       },
     });
 
-    const loginDto: LoginDto = createdUser;
-    return await this.login(loginDto);
+    const payload: PayloadDto = createdUser;
+    return await this.authorizeUser(payload);
   }
 
   async login(loginDto: LoginDto) {
@@ -78,20 +83,22 @@ export class AuthService {
     }
 
     const payload: PayloadDto = foundUser;
-    const accessToken = await this.jwtService.signAsync(payload);
-    return ResponseDto.generateResponse(USER_IS_AUTHORIZED, accessToken);
+    return await this.authorizeUser(payload);
   }
 
   async getProfile(user: PayloadDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundProfile = await this.prismaProvider.user.findUnique({
       where: { id: user.id },
+      select: profileInclusionFields,
     });
-    if (!foundUser) {
+    if (!foundProfile) {
       return ResponseDto.generateResponse(USER_NOT_FOUND);
     }
 
-    const profileDto: ProfileDto = foundUser;
-    return ResponseDto.generateResponse(USER_PROFILE_IS_RETRIEVED, profileDto);
+    return ResponseDto.generateResponse(
+      USER_PROFILE_IS_RETRIEVED,
+      foundProfile,
+    );
   }
 
   async sendVerificationEmail(user: PayloadDto) {
