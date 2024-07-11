@@ -1,4 +1,4 @@
-import { PrismaProvider } from 'src/providers/prisma.provider';
+import { DatabaseProvider } from 'src/providers/database.provider';
 
 import { Module } from '@nestjs/common';
 
@@ -7,6 +7,6 @@ import { TransactionService } from './transaction.service';
 
 @Module({
   controllers: [TransactionController],
-  providers: [TransactionService, PrismaProvider],
+  providers: [TransactionService, DatabaseProvider],
 })
 export class TransactionModule {}

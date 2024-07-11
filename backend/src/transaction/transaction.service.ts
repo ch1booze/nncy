@@ -1,6 +1,6 @@
 import Dinero from 'dinero.js';
 import { PayloadDto } from 'src/auth/dto';
-import { PrismaProvider } from 'src/providers/prisma.provider';
+import { DatabaseProvider } from 'src/providers/database.provider';
 import { ResponseDto } from 'src/utils/response.dto';
 import {
   ACCOUNT_IS_EXPENDED,
@@ -16,10 +16,10 @@ import { ExpenseDto, TransactionFilterQueries } from './dto';
 
 @Injectable()
 export class TransactionService {
-  constructor(private prismaProvider: PrismaProvider) {}
+  constructor(private databaseProvider: DatabaseProvider) {}
 
   async sendMoney(user: PayloadDto, expenseDto: ExpenseDto) {
-    const foundAccount = await this.prismaProvider.account.findUnique({
+    const foundAccount = await this.databaseProvider.account.findUnique({
       where: { userId: user.id, number: expenseDto.accountNumber },
     });
     if (!foundAccount) {
@@ -42,7 +42,7 @@ export class TransactionService {
 
     const newBalance = accountBalance.subtract(expense);
 
-    await this.prismaProvider.account.update({
+    await this.databaseProvider.account.update({
       where: { number: expenseDto.accountNumber },
       data: {
         balance: newBalance.getAmount(),
@@ -63,7 +63,7 @@ export class TransactionService {
     user: PayloadDto,
     transactionFilterQueries: TransactionFilterQueries,
   ) {
-    const foundTransactions = this.prismaProvider.transaction.findMany({
+    const foundTransactions = this.databaseProvider.transaction.findMany({
       where: {
         userId: user.id,
         account: { id: transactionFilterQueries.accountId },

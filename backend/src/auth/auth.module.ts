@@ -1,7 +1,7 @@
 import { EmailProvider } from 'src/providers/email.provider';
 import { BankingProvider } from 'src/providers/banking.provider';
 import { OtpProvider } from 'src/providers/otp.provider';
-import { PrismaProvider } from 'src/providers/prisma.provider';
+import { DatabaseProvider } from 'src/providers/database.provider';
 
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -29,7 +29,7 @@ import { JwtStrategy } from './jwt.strategy';
   providers: [
     AuthService,
     JwtStrategy,
-    PrismaProvider,
+    DatabaseProvider,
     EmailProvider,
     OtpProvider,
     BankingProvider,

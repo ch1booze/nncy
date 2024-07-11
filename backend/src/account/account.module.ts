@@ -1,7 +1,7 @@
 import { BvnProvider } from 'src/providers/bvn.provider';
 import { BankingProvider } from 'src/providers/banking.provider';
 import { OtpProvider } from 'src/providers/otp.provider';
-import { PrismaProvider } from 'src/providers/prisma.provider';
+import { DatabaseProvider } from 'src/providers/database.provider';
 import { SmsProvider } from 'src/providers/sms.provider';
 
 import { Module } from '@nestjs/common';
@@ -14,7 +14,7 @@ import { AccountService } from './account.service';
   providers: [
     AccountService,
     BankingProvider,
-    PrismaProvider,
+    DatabaseProvider,
     OtpProvider,
     SmsProvider,
     BvnProvider,

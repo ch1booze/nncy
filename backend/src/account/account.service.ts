@@ -2,7 +2,7 @@ import { PayloadDto, TokenDto } from 'src/auth/dto';
 import { BvnProvider, PhoneDto } from 'src/providers/bvn.provider';
 import { BankingProvider } from 'src/providers/banking.provider';
 import { OtpDto, OtpProvider } from 'src/providers/otp.provider';
-import { PrismaProvider } from 'src/providers/prisma.provider';
+import { DatabaseProvider } from 'src/providers/database.provider';
 import {
   SendSmsDto,
   SmsProvider,
@@ -30,14 +30,14 @@ import { AccountDto, accountSummary, BvnDto } from './dto/account.dto';
 export class AccountService {
   constructor(
     private bankingProvider: BankingProvider,
-    private prismaProvider: PrismaProvider,
+    private databaseProvider: DatabaseProvider,
     private smsProvider: SmsProvider,
     private bvnProvider: BvnProvider,
     private otpProvider: OtpProvider,
   ) {}
 
   async sendBvnVerification(user: PayloadDto, bvnDto: BvnDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser.isEmailVerified) {
@@ -47,7 +47,7 @@ export class AccountService {
     const phoneDto: PhoneDto =
       await this.bvnProvider.getPhoneLinkedToBvn(bvnDto);
     const otpDto: OtpDto = await this.otpProvider.generateOtp();
-    await this.prismaProvider.user.update({
+    await this.databaseProvider.user.update({
       where: { id: user.id },
       data: { secret: otpDto.secret },
     });
@@ -64,7 +64,7 @@ export class AccountService {
   }
 
   async verifyBvn(user: PayloadDto, tokenDto: TokenDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser) {
@@ -80,7 +80,7 @@ export class AccountService {
       return ResponseDto.generateResponse(OTP_NOT_VALID);
     }
 
-    await this.prismaProvider.user.update({
+    await this.databaseProvider.user.update({
       where: { id: user.id },
       data: { isBvnVerified: true },
     });
@@ -89,7 +89,7 @@ export class AccountService {
   }
 
   async getAccountsLinkedToUser(user: PayloadDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser.isBvnVerified) {
@@ -109,14 +109,14 @@ export class AccountService {
   }
 
   async linkAccounts(user: PayloadDto, accounts: AccountDto[]) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser) {
       return ResponseDto.generateResponse(USER_NOT_FOUND);
     }
 
-    await this.prismaProvider.account.createMany({
+    await this.databaseProvider.account.createMany({
       data: accounts,
       skipDuplicates: true,
     });
@@ -125,14 +125,14 @@ export class AccountService {
   }
 
   async getAccountsSummary(user: PayloadDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser) {
       return ResponseDto.generateResponse(USER_NOT_FOUND);
     }
 
-    const foundAccounts = await this.prismaProvider.account.findMany({
+    const foundAccounts = await this.databaseProvider.account.findMany({
       where: { userId: user.id },
       select: accountSummary,
     });
@@ -141,14 +141,14 @@ export class AccountService {
   }
 
   async getAccountById(user: PayloadDto, index: number) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser) {
       return ResponseDto.generateResponse(USER_NOT_FOUND);
     }
 
-    const foundAccount = await this.prismaProvider.account.findFirst({
+    const foundAccount = await this.databaseProvider.account.findFirst({
       where: { userId: user.id },
       skip: index,
       take: 1,

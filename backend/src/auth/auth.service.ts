@@ -5,7 +5,7 @@ import {
   SendEmailDto,
 } from 'src/providers/email.provider';
 import { OtpDto, OtpProvider } from 'src/providers/otp.provider';
-import { PrismaProvider } from 'src/providers/prisma.provider';
+import { DatabaseProvider } from 'src/providers/database.provider';
 import { ResponseDto } from 'src/utils/response.dto';
 import {
   EMAIL_ALREADY_EXISTS,
@@ -35,7 +35,7 @@ import {
 @Injectable()
 export class AuthService {
   constructor(
-    private prismaProvider: PrismaProvider,
+    private databaseProvider: DatabaseProvider,
     private jwtService: JwtService,
     private emailProvider: EmailProvider,
     private otpProvider: OtpProvider,
@@ -47,7 +47,7 @@ export class AuthService {
   }
 
   async signup(signupDto: SignupDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { email: signupDto.email },
     });
     if (foundUser) {
@@ -55,7 +55,7 @@ export class AuthService {
     }
 
     const hashedPassword = await argon2.hash(signupDto.password);
-    const createdUser = await this.prismaProvider.user.create({
+    const createdUser = await this.databaseProvider.user.create({
       data: {
         ...signupDto,
         password: hashedPassword,
@@ -67,7 +67,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { email: loginDto.email },
     });
     if (!foundUser) {
@@ -87,7 +87,7 @@ export class AuthService {
   }
 
   async getProfile(user: PayloadDto) {
-    const foundProfile = await this.prismaProvider.user.findUnique({
+    const foundProfile = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
       select: profileInclusionFields,
     });
@@ -102,7 +102,7 @@ export class AuthService {
   }
 
   async sendVerificationEmail(user: PayloadDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser) {
@@ -110,7 +110,7 @@ export class AuthService {
     }
 
     const otpDto: OtpDto = await this.otpProvider.generateOtp();
-    const updatedUser = await this.prismaProvider.user.update({
+    const updatedUser = await this.databaseProvider.user.update({
       where: { id: foundUser.id },
       data: { secret: otpDto.secret },
     });
@@ -127,7 +127,7 @@ export class AuthService {
   }
 
   async verifyEmail(user: PayloadDto, tokenDto: TokenDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser) {
@@ -140,7 +140,7 @@ export class AuthService {
       return ResponseDto.generateResponse(OTP_NOT_VALID);
     }
 
-    await this.prismaProvider.user.update({
+    await this.databaseProvider.user.update({
       where: { id: user.id },
       data: { isEmailVerified: true },
     });
@@ -148,7 +148,7 @@ export class AuthService {
   }
 
   async sendResetPasswordEmail(emailDto: EmailDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { email: emailDto.email },
     });
     if (!foundUser) {
@@ -156,7 +156,7 @@ export class AuthService {
     }
 
     const otpDto: OtpDto = await this.otpProvider.generateOtp();
-    const updatedUser = await this.prismaProvider.user.update({
+    const updatedUser = await this.databaseProvider.user.update({
       where: { id: foundUser.id },
       data: { secret: otpDto.secret },
     });
@@ -173,7 +173,7 @@ export class AuthService {
   }
 
   async verifyResetPassword(resetPasswordDto: ResetPasswordDto) {
-    const foundUser = await this.prismaProvider.user.findUnique({
+    const foundUser = await this.databaseProvider.user.findUnique({
       where: { email: resetPasswordDto.email },
     });
     if (!foundUser) {
@@ -190,7 +190,7 @@ export class AuthService {
     }
 
     const hashedPassword = await argon2.hash(resetPasswordDto.password);
-    await this.prismaProvider.user.update({
+    await this.databaseProvider.user.update({
       where: { email: resetPasswordDto.email },
       data: { password: hashedPassword },
     });
