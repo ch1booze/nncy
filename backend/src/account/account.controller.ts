@@ -34,4 +34,9 @@ export class AccountController {
   async linkAccounts(@User() user: PayloadDto, @Body() accounts: AccountDto[]) {
     return this.accountService.linkAccounts(user, accounts);
   }
+
+  @Get('get-accounts')
+  async getAccounts(@User() user: PayloadDto) {
+    return await this.accountService.getAccounts(user);
+  }
 }

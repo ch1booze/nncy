@@ -11,13 +11,14 @@ import {
 import { ResponseDto } from 'src/utils/response.dto';
 import {
   ACCOUNTS_ARE_LINKED,
-  ACCOUNTS_ARE_RETRIEVED,
+  LINKED_ACCOUNTS_ARE_RETRIEVED,
   BVN_IS_VERIFIED,
   BVN_NOT_VERIFIED,
   EMAIL_NOT_VERIFIED,
   OTP_NOT_VALID,
   SMS_IS_SENT,
   USER_NOT_FOUND,
+  ACCOUNTS_ARE_RETRIEVED,
 } from 'src/utils/response.types';
 
 import { Injectable } from '@nestjs/common';
@@ -100,7 +101,7 @@ export class AccountService {
     );
 
     return ResponseDto.generateResponse(
-      ACCOUNTS_ARE_RETRIEVED,
+      LINKED_ACCOUNTS_ARE_RETRIEVED,
       accountsLinkedToUser,
     );
   }
@@ -119,5 +120,20 @@ export class AccountService {
     });
 
     return ResponseDto.generateResponse(ACCOUNTS_ARE_LINKED);
+  }
+
+  async getAccounts(user: PayloadDto) {
+    const foundUser = await this.prismaProvider.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!foundUser) {
+      return ResponseDto.generateResponse(USER_NOT_FOUND);
+    }
+
+    const foundAccounts = await this.prismaProvider.account.findMany({
+      where: { userId: user.id },
+    });
+
+    return ResponseDto.generateResponse(ACCOUNTS_ARE_RETRIEVED, foundAccounts);
   }
 }

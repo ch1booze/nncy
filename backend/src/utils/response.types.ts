@@ -96,9 +96,9 @@ export const BVN_NOT_VERIFIED: ResponseType = {
   message: 'BVN not verified',
 };
 
-export const ACCOUNTS_ARE_RETRIEVED: ResponseType = {
+export const LINKED_ACCOUNTS_ARE_RETRIEVED: ResponseType = {
   status: HttpStatus.OK,
-  message: 'Accounts are retrieved',
+  message: 'Linked accounts are retrieved',
 };
 
 export const ACCOUNTS_ARE_LINKED: ResponseType = {
@@ -124,4 +124,9 @@ export const ACCOUNT_IS_EXPENDED: ResponseType = {
 export const TOKEN_NOT_FOUND: ResponseType = {
   status: HttpStatus.BAD_REQUEST,
   message: 'Token not found',
+};
+
+export const ACCOUNTS_ARE_RETRIEVED: ResponseType = {
+  status: HttpStatus.OK,
+  message: 'Accounts are retrieved',
 };
