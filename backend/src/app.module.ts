@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AccountModule } from './account/account.module';
+import { AgentsModule } from './agents/agents.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -19,6 +20,7 @@ import { ResponseInterceptor } from './utils/response.interceptor';
       envFilePath: '.env',
     }),
     TransactionModule,
+    AgentsModule,
   ],
   controllers: [AppController],
   providers: [
