@@ -2,7 +2,16 @@ import { PayloadDto } from 'src/auth/dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/utils/user.decorator';
 
-import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 
 import { AccountService } from './account.service';
 import { AccountDto, BvnDto, VerifyBvnDto } from './dto/account.dto';
@@ -32,11 +41,19 @@ export class AccountController {
 
   @Put('link-accounts')
   async linkAccounts(@User() user: PayloadDto, @Body() accounts: AccountDto[]) {
-    return this.accountService.linkAccounts(user, accounts);
+    return await this.accountService.linkAccounts(user, accounts);
   }
 
   @Get('get-accounts')
   async getAccounts(@User() user: PayloadDto) {
     return await this.accountService.getAccounts(user);
+  }
+
+  @Get('get-account/:id')
+  async getAccountById(
+    @User() user: PayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return await this.accountService.getAccountById(user, id);
   }
 }
