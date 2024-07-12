@@ -57,6 +57,12 @@ export class BvnDto {
   bvn: string;
 }
 
+export class PhoneDto {
+  @IsNumberString()
+  @Length(11)
+  phone: string;
+}
+
 export const accountSummary = {
   bankName: true,
   balance: true,

@@ -1,6 +1,6 @@
 import Dinero from 'dinero.js';
 import * as seedrandom from 'seedrandom';
-import { AccountDto } from 'src/account/dto/account.dto';
+import { AccountDto, BvnDto } from 'src/account/dto/account.dto';
 
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
@@ -59,5 +59,12 @@ export class BankingProvider {
     }
 
     return accountsLinkedToUser;
+  }
+
+  async getPhoneLinkedToBvn(bvnDto: BvnDto) {
+    faker.seed(Number(bvnDto.bvn));
+
+    const phoneLinkedToBvn = `+234-${faker.phone.number()}`.replace('-', '');
+    return { phone: phoneLinkedToBvn };
   }
 }

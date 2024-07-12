@@ -1,4 +1,3 @@
-import { BvnProvider } from 'src/providers/bvn.provider';
 import { BankingProvider } from 'src/providers/banking.provider';
 import { OtpProvider } from 'src/providers/otp.provider';
 import { DatabaseProvider } from 'src/providers/database.provider';
@@ -17,7 +16,6 @@ import { AccountService } from './account.service';
     DatabaseProvider,
     OtpProvider,
     SmsProvider,
-    BvnProvider,
   ],
 })
 export class AccountModule {}

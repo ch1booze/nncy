@@ -1,8 +1,7 @@
 import { PayloadDto, TokenDto } from 'src/auth/dto';
-import { BvnProvider, PhoneDto } from 'src/providers/bvn.provider';
 import { BankingProvider } from 'src/providers/banking.provider';
-import { OtpDto, OtpProvider } from 'src/providers/otp.provider';
 import { DatabaseProvider } from 'src/providers/database.provider';
+import { OtpDto, OtpProvider } from 'src/providers/otp.provider';
 import {
   SendSmsDto,
   SmsProvider,
@@ -24,7 +23,12 @@ import {
 
 import { Injectable } from '@nestjs/common';
 
-import { AccountDto, accountSummary, BvnDto } from './dto/account.dto';
+import {
+  AccountDto,
+  accountSummary,
+  BvnDto,
+  PhoneDto,
+} from './dto/account.dto';
 
 @Injectable()
 export class AccountService {
@@ -32,7 +36,6 @@ export class AccountService {
     private bankingProvider: BankingProvider,
     private databaseProvider: DatabaseProvider,
     private smsProvider: SmsProvider,
-    private bvnProvider: BvnProvider,
     private otpProvider: OtpProvider,
   ) {}
 
@@ -45,7 +48,7 @@ export class AccountService {
     }
 
     const phoneDto: PhoneDto =
-      await this.bvnProvider.getPhoneLinkedToBvn(bvnDto);
+      await this.bankingProvider.getPhoneLinkedToBvn(bvnDto);
     const otpDto: OtpDto = await this.otpProvider.generateOtp();
     await this.databaseProvider.user.update({
       where: { id: user.id },
