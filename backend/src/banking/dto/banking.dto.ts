@@ -51,6 +51,13 @@ export class AccountDto {
   userId: string;
 }
 
+export class AccountNumberDto {
+  @IsNumberString()
+  @IsNotEmpty()
+  @Length(10)
+  number: string;
+}
+
 export class BvnDto {
   @IsNumberString()
   @Length(10)

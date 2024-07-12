@@ -14,9 +14,9 @@ import {
 } from '@nestjs/common';
 
 import { AccountService } from './banking.service';
-import { AccountDto, BvnDto } from './dto/banking.dto';
+import { AccountNumberDto, BvnDto } from './dto/banking.dto';
 
-@Controller('account')
+@Controller('banking')
 @UseGuards(JwtAuthGuard)
 export class BankingController {
   constructor(private readonly bankingService: AccountService) {}
@@ -37,8 +37,11 @@ export class BankingController {
   }
 
   @Put('link-accounts')
-  async linkAccounts(@User() user: PayloadDto, @Body() accounts: AccountDto[]) {
-    return await this.bankingService.linkAccounts(user, accounts);
+  async linkAccounts(
+    @User() user: PayloadDto,
+    @Body() accountNumbers: AccountNumberDto[],
+  ) {
+    return await this.bankingService.linkAccounts(user, accountNumbers);
   }
 
   @Get('get-accounts')

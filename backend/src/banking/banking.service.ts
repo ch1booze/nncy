@@ -24,7 +24,7 @@ import {
 import { Injectable } from '@nestjs/common';
 
 import {
-  AccountDto,
+  AccountNumberDto,
   accountSummary,
   BvnDto,
   PhoneDto,
@@ -111,13 +111,23 @@ export class AccountService {
     );
   }
 
-  async linkAccounts(user: PayloadDto, accounts: AccountDto[]) {
+  async linkAccounts(user: PayloadDto, accountNumbers: AccountNumberDto[]) {
     const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser) {
       return ResponseDto.generateResponse(USER_NOT_FOUND);
     }
+
+    const accountsLinkedToUser =
+      await this.bankingProvider.getAccountsLinkedToUser(
+        user.id,
+        foundUser.bvn,
+      );
+
+    const accounts = accountsLinkedToUser.filter((account) =>
+      accountNumbers.some(({ number }) => number === account.number),
+    );
 
     await this.databaseProvider.account.createMany({
       data: accounts,
