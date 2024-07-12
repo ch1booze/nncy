@@ -2,25 +2,23 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 
-import { AccountModule } from './account/account.module';
+import { BankingModule } from './banking/banking.module';
 import { AgentsModule } from './agents/agents.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { TransactionModule } from './transaction/transaction.module';
 import { HttpExceptionFilter } from './utils/http-exception.filter';
 import { ResponseInterceptor } from './utils/response.interceptor';
 
 @Module({
   imports: [
-    AccountModule,
+    AgentsModule,
     AuthModule,
+    BankingModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
-    TransactionModule,
-    AgentsModule,
   ],
   controllers: [AppController],
   providers: [

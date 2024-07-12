@@ -13,37 +13,37 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { AccountService } from './account.service';
-import { AccountDto, BvnDto } from './dto/account.dto';
+import { AccountService } from './banking.service';
+import { AccountDto, BvnDto } from './dto/banking.dto';
 
 @Controller('account')
 @UseGuards(JwtAuthGuard)
-export class AccountController {
-  constructor(private readonly accountService: AccountService) {}
+export class BankingController {
+  constructor(private readonly bankingService: AccountService) {}
 
   @Post('send-bvn-verification')
   async sendBvnVerification(@User() user: PayloadDto, @Body() bvnDto: BvnDto) {
-    return await this.accountService.sendBvnVerification(user, bvnDto);
+    return await this.bankingService.sendBvnVerification(user, bvnDto);
   }
 
   @Post('verify-bvn')
   async verifyBvn(@User() user: PayloadDto, @Body() tokenDto: TokenDto) {
-    return await this.accountService.verifyBvn(user, tokenDto);
+    return await this.bankingService.verifyBvn(user, tokenDto);
   }
 
   @Get('get-accounts-linked-to-user')
   async getAccountsLinkedToUser(@User() user: PayloadDto) {
-    return await this.accountService.getAccountsLinkedToUser(user);
+    return await this.bankingService.getAccountsLinkedToUser(user);
   }
 
   @Put('link-accounts')
   async linkAccounts(@User() user: PayloadDto, @Body() accounts: AccountDto[]) {
-    return await this.accountService.linkAccounts(user, accounts);
+    return await this.bankingService.linkAccounts(user, accounts);
   }
 
   @Get('get-accounts')
   async getAccounts(@User() user: PayloadDto) {
-    return await this.accountService.getAccountsSummary(user);
+    return await this.bankingService.getAccountsSummary(user);
   }
 
   @Get('get-account/:index')
@@ -51,6 +51,6 @@ export class AccountController {
     @User() user: PayloadDto,
     @Param('index', ParseIntPipe) index: number,
   ) {
-    return await this.accountService.getAccountById(user, index);
+    return await this.bankingService.getAccountById(user, index);
   }
 }

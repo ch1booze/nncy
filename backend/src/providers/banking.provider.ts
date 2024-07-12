@@ -1,6 +1,6 @@
 import Dinero from 'dinero.js';
 import * as seedrandom from 'seedrandom';
-import { AccountDto, BvnDto } from 'src/account/dto/account.dto';
+import { AccountDto, BvnDto } from 'src/banking/dto/banking.dto';
 
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';

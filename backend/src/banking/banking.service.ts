@@ -28,7 +28,7 @@ import {
   accountSummary,
   BvnDto,
   PhoneDto,
-} from './dto/account.dto';
+} from './dto/banking.dto';
 
 @Injectable()
 export class AccountService {

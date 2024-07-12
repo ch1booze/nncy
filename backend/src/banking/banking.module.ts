@@ -5,11 +5,11 @@ import { SmsProvider } from 'src/providers/sms.provider';
 
 import { Module } from '@nestjs/common';
 
-import { AccountController } from './account.controller';
-import { AccountService } from './account.service';
+import { BankingController } from './banking.controller';
+import { AccountService } from './banking.service';
 
 @Module({
-  controllers: [AccountController],
+  controllers: [BankingController],
   providers: [
     AccountService,
     BankingProvider,
@@ -18,4 +18,4 @@ import { AccountService } from './account.service';
     SmsProvider,
   ],
 })
-export class AccountModule {}
+export class BankingModule {}
