@@ -121,9 +121,9 @@ export class AuthService {
       token: otpDto.token,
       emailTemplate: EmailTemplate.VERIFICATION,
     };
+    const sentEmail = await this.emailProvider.sendEmail(sendEmailDto);
 
-    await this.emailProvider.sendEmail(sendEmailDto);
-    return ResponseDto.generateResponse(EMAIL_IS_SENT);
+    return ResponseDto.generateResponse(EMAIL_IS_SENT, sentEmail);
   }
 
   async verifyEmail(user: PayloadDto, tokenDto: TokenDto) {

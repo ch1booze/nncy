@@ -80,17 +80,17 @@ export class BankingProvider {
     seedrandom(Number(bvnDto.bvn));
 
     const today = DateTime.now().toISODate();
-    const beginning = '2001-01-01';
+    // const beginning = '2001-01-01';
     const endDate = DateTime.fromISO(transactionsFilters.endDate ?? today);
-    const startDate = DateTime.fromISO(
-      transactionsFilters.startDate ?? beginning,
-    );
+    // const startDate = DateTime.fromISO(
+    //   transactionsFilters.startDate ?? beginning,
+    // );
 
     const transactions: TransactionDto[] = [];
 
-    const { days } = endDate.diff(startDate, 'days').toObject();
+    const days = 10;
     for (let day = 0; day < days; day++) {
-      const numberOfTransactions = Math.floor(Math.random() * 5) + 1;
+      const numberOfTransactions = Math.floor(Math.random() * 3) + 1;
       for (let i = 0; i < numberOfTransactions; i++) {
         const transactionId = faker.string.uuid();
         const timestamp = endDate.minus({ hours: i, minutes: i }).toISO();
@@ -110,6 +110,7 @@ export class BankingProvider {
         const accountNumber = faker.helpers.arrayElement(
           transactionsFilters.accountNumbers,
         );
+
         const balanceAfter = dinero({
           amount: parseInt(faker.finance.amount()),
           currency: NGN,
@@ -126,5 +127,7 @@ export class BankingProvider {
         });
       }
     }
+
+    return transactions;
   }
 }

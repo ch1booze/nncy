@@ -210,8 +210,18 @@ export class AccountService {
       return ResponseDto.generateResponse(USER_NOT_FOUND);
     }
 
+    const foundAccountNumbers = await this.databaseProvider.account.findMany({
+      where: { userId: user.id },
+      select: { number: true },
+    });
+
+    transactionFilters.accountNumbers =
+      transactionFilters.accountNumbers === undefined
+        ? foundAccountNumbers
+        : transactionFilters.accountNumbers;
+
     const bvnDto: BvnDto = { bvn: foundUser.bvn };
-    const transactions = this.bankingProvider.getTransactions(
+    const transactions = await this.bankingProvider.getTransactions(
       bvnDto,
       transactionFilters,
     );

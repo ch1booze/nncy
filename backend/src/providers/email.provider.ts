@@ -61,5 +61,7 @@ export class EmailProvider {
       },
       recipients: { name: sendEmailDto.name, email: sendEmailDto.email },
     });
+
+    return message;
   }
 }
