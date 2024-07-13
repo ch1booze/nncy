@@ -77,4 +77,15 @@ export class BankingController {
   ) {
     return await this.bankingService.getTransactions(user, transactionFilters);
   }
+
+  @Post('get-transfer-account-details')
+  async getTransferAccountDetails(
+    @User() user: PayloadDto,
+    @Body() transferAccountNumberDto: AccountNumberDto,
+  ) {
+    return await this.bankingService.getAccountDetails(
+      user,
+      transferAccountNumberDto,
+    );
+  }
 }

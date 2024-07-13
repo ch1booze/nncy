@@ -2,6 +2,7 @@ import {
   IsDate,
   IsDateString,
   IsEmail,
+  IsIBAN,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
@@ -91,6 +92,39 @@ export class TransactionDto {
 
   @IsNotEmpty()
   balanceAfter: Dinero<number>;
+}
+
+export class TransferAccountDto {
+  @IsString()
+  @IsNotEmpty()
+  accountName: string;
+
+  @IsIBAN()
+  @IsNotEmpty()
+  bankCode: string;
+
+  @IsNotEmpty()
+  accountNumber: AccountNumberDto;
+}
+
+export class TransferFundsDto {
+  @IsString()
+  @IsNotEmpty()
+  transferAccountName: string;
+
+  @IsIBAN()
+  @IsNotEmpty()
+  transferBankCode: string;
+
+  @IsNotEmpty()
+  amount: Dinero<number>;
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
+  @IsNotEmpty()
+  accountNumber: AccountNumberDto;
 }
 
 export enum TransactionType {

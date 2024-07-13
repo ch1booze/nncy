@@ -8,6 +8,7 @@ import {
   TransactionDto,
   TransactionFilters,
   TransactionType,
+  TransferAccountDto,
 } from 'src/banking/dto/banking.dto';
 
 import { NGN } from '@dinero.js/currencies';
@@ -129,5 +130,19 @@ export class BankingProvider {
     }
 
     return transactions;
+  }
+
+  async getAccountDetails(accountNumberDto: AccountNumberDto) {
+    faker.seed(Number(accountNumberDto.number));
+    const accountName = faker.person.fullName();
+    const bankCode = faker.finance.iban();
+
+    const accountDetails: TransferAccountDto = {
+      accountName,
+      bankCode,
+      accountNumber: accountNumberDto,
+    };
+
+    return accountDetails;
   }
 }

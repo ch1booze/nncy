@@ -9,6 +9,7 @@ import {
 } from 'src/providers/sms.provider';
 import { ResponseDto } from 'src/utils/response.dto';
 import {
+  ACCOUNT_DETAILS_IS_RETRIEVED,
   ACCOUNT_IS_RETRIEVED,
   ACCOUNTS_ARE_LINKED,
   ACCOUNTS_ARE_RETRIEVED,
@@ -229,6 +230,27 @@ export class AccountService {
     return ResponseDto.generateResponse(
       TRANSACTIONS_ARE_RETRIEVED,
       transactions,
+    );
+  }
+
+  async getAccountDetails(
+    user: PayloadDto,
+    transferAccountNumberDto: AccountNumberDto,
+  ) {
+    const foundUser = await this.databaseProvider.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!foundUser) {
+      return ResponseDto.generateResponse(USER_NOT_FOUND);
+    }
+
+    const transferAccountDetails = await this.bankingProvider.getAccountDetails(
+      transferAccountNumberDto,
+    );
+
+    return ResponseDto.generateResponse(
+      ACCOUNT_DETAILS_IS_RETRIEVED,
+      transferAccountDetails,
     );
   }
 }
