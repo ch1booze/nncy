@@ -64,14 +64,12 @@ export class PhoneDto {
 
 interface AccountSummary {
   bankName: boolean;
-  balance: boolean;
   number: boolean;
-  currency: boolean;
+  currencyCode: boolean;
 }
 
 export const accountSummary: AccountSummary = {
   bankName: true,
-  balance: true,
   number: true,
-  currency: true,
+  currencyCode: true,
 };

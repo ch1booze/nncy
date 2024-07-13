@@ -49,11 +49,11 @@ export class BankingProvider {
     accountNumbers: AccountNumberDto[],
   ) {
     const accountsBalances = [];
-    for (const accountNumber of accountNumbers) {
-      faker.seed(Number(bvnDto.bvn) + Number(accountNumber));
+    for (const { number } of accountNumbers) {
+      faker.seed(Number(bvnDto.bvn) + Number(number));
       accountsBalances.push(
         dinero({
-          amount: parseInt(faker.finance.amount()),
+          amount: parseInt(faker.finance.amount({ min: 10000, max: 100000 })),
           currency: NGN,
         }),
       );

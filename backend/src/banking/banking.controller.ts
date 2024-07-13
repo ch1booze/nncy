@@ -57,7 +57,7 @@ export class BankingController {
     return await this.bankingService.getAccountById(user, index);
   }
 
-  @Get('get-accounts-balances')
+  @Post('get-accounts-balances')
   async getAccountsBalances(
     @User() user: PayloadDto,
     @Body() accountNumbers: AccountNumberDto[],
