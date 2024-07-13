@@ -2,7 +2,6 @@ import {
   IsDate,
   IsEmail,
   IsNotEmpty,
-  IsNumber,
   IsNumberString,
   IsPhoneNumber,
   IsString,
@@ -31,11 +30,7 @@ export class AccountDto {
   @IsString()
   @IsNotEmpty()
   @Length(3)
-  currency: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  balance: number;
+  currencyCode: string;
 
   @IsString()
   @IsNotEmpty()
@@ -46,9 +41,6 @@ export class AccountDto {
 
   @IsEmail()
   email?: string;
-
-  @IsString()
-  userId: string;
 }
 
 export class AccountNumberDto {
@@ -70,7 +62,14 @@ export class PhoneDto {
   phone: string;
 }
 
-export const accountSummary = {
+interface AccountSummary {
+  bankName: boolean;
+  balance: boolean;
+  number: boolean;
+  currency: boolean;
+}
+
+export const accountSummary: AccountSummary = {
   bankName: true,
   balance: true,
   number: true,

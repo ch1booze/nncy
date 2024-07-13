@@ -10,6 +10,7 @@ import {
 import { ResponseDto } from 'src/utils/response.dto';
 import {
   ACCOUNT_IS_RETRIEVED,
+  ACCOUNTS_BALANCES_ARE_RETRIEVED,
   ACCOUNTS_ARE_LINKED,
   ACCOUNTS_ARE_RETRIEVED,
   BVN_IS_VERIFIED,
@@ -91,7 +92,7 @@ export class AccountService {
     return ResponseDto.generateResponse(BVN_IS_VERIFIED);
   }
 
-  async getAccountsLinkedToUser(user: PayloadDto) {
+  async getAccountsLinkedToBvn(user: PayloadDto) {
     const foundUser = await this.databaseProvider.user.findUnique({
       where: { id: user.id },
     });
@@ -99,15 +100,13 @@ export class AccountService {
       return ResponseDto.generateResponse(BVN_NOT_VERIFIED);
     }
 
-    const accountsLinkedToUser =
-      await this.bankingProvider.getAccountsLinkedToUser(
-        user.id,
-        foundUser.bvn,
-      );
+    const bvnDto: BvnDto = { bvn: foundUser.bvn };
+    const accountsLinkedToBvn =
+      await this.bankingProvider.getAccountsLinkedToBvn(bvnDto);
 
     return ResponseDto.generateResponse(
       LINKED_ACCOUNTS_ARE_RETRIEVED,
-      accountsLinkedToUser,
+      accountsLinkedToBvn,
     );
   }
 
@@ -119,15 +118,20 @@ export class AccountService {
       return ResponseDto.generateResponse(USER_NOT_FOUND);
     }
 
-    const accountsLinkedToUser =
-      await this.bankingProvider.getAccountsLinkedToUser(
-        user.id,
-        foundUser.bvn,
-      );
+    const bvnDto: BvnDto = { bvn: foundUser.bvn };
+    const accountsLinkedToBvn =
+      await this.bankingProvider.getAccountsLinkedToBvn(bvnDto);
 
-    const accounts = accountsLinkedToUser.filter((account) =>
-      accountNumbers.some(({ number }) => number === account.number),
-    );
+    const accounts = accountsLinkedToBvn
+      .filter((account) =>
+        accountNumbers.some(({ number }) => number === account.number),
+      )
+      .map((account) => {
+        return {
+          ...account,
+          userId: user.id,
+        };
+      });
 
     await this.databaseProvider.account.createMany({
       data: accounts,
@@ -135,6 +139,29 @@ export class AccountService {
     });
 
     return ResponseDto.generateResponse(ACCOUNTS_ARE_LINKED);
+  }
+
+  async getAccountsBalances(
+    user: PayloadDto,
+    accountNumbers: AccountNumberDto[],
+  ) {
+    const foundUser = await this.databaseProvider.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!foundUser) {
+      return ResponseDto.generateResponse(USER_NOT_FOUND);
+    }
+
+    const bvnDto: BvnDto = { bvn: foundUser.bvn };
+    const accountsBalances = await this.bankingProvider.getAccountsBalances(
+      bvnDto,
+      accountNumbers,
+    );
+
+    return ResponseDto.generateResponse(
+      ACCOUNTS_BALANCES_ARE_RETRIEVED,
+      accountsBalances,
+    );
   }
 
   async getAccountsSummary(user: PayloadDto) {

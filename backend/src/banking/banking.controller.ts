@@ -31,9 +31,9 @@ export class BankingController {
     return await this.bankingService.verifyBvn(user, tokenDto);
   }
 
-  @Get('get-accounts-linked-to-user')
-  async getAccountsLinkedToUser(@User() user: PayloadDto) {
-    return await this.bankingService.getAccountsLinkedToUser(user);
+  @Get('get-accounts-linked-to-bvn')
+  async getAccountsLinkedToBvn(@User() user: PayloadDto) {
+    return await this.bankingService.getAccountsLinkedToBvn(user);
   }
 
   @Put('link-accounts')
@@ -55,5 +55,13 @@ export class BankingController {
     @Param('index', ParseIntPipe) index: number,
   ) {
     return await this.bankingService.getAccountById(user, index);
+  }
+
+  @Get('get-accounts-balances')
+  async getAccountsBalances(
+    @User() user: PayloadDto,
+    @Body() accountNumbers: AccountNumberDto[],
+  ) {
+    return await this.bankingService.getAccountsBalances(user, accountNumbers);
   }
 }

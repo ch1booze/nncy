@@ -22,6 +22,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@dinero.js/currencies": "^2.0.0-alpha.14",
     "@langchain/core": "^0.2.15",
     "@langchain/groq": "^0.0.13",
     "@langchain/langgraph": "^0.0.26",
@@ -35,7 +36,7 @@
     "argon2": "^0.40.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "dinero.js": "^1.9.1",
+    "dinero.js": "^2.0.0-alpha.14",
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.2.9",
     "passport": "^0.7.0",
@@ -55,7 +56,6 @@
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
     "@prisma/client": "^5.16.0",
-    "@types/dinero.js": "^1.9.4",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",

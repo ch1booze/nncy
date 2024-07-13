@@ -36,6 +36,11 @@ export const ACCOUNTS_ARE_RETRIEVED: ResponseType = {
   message: 'Accounts are retrieved',
 };
 
+export const ACCOUNTS_BALANCES_ARE_RETRIEVED: ResponseType = {
+  status: HttpStatus.OK,
+  message: 'Accounts balances are retrieved',
+};
+
 // BVN
 export const BVN_IS_VERIFIED: ResponseType = {
   status: HttpStatus.OK,

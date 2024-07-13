@@ -34,7 +34,6 @@ model Account {
   number       String        @unique
   type         AccountType
   status       AccountStatus
-  balance      Decimal       @db.Money
   bankName     String
   openingDate  DateTime      @db.Date
   currencyCode String
@@ -56,5 +55,4 @@ enum AccountType {
   Current
   Savings
   Fixed
-  Domiciliary
 }

@@ -1,69 +1,69 @@
-import Dinero from 'dinero.js';
+import { dinero } from 'dinero.js';
 import * as seedrandom from 'seedrandom';
-import { AccountDto, BvnDto } from 'src/banking/dto/banking.dto';
+import {
+  AccountDto,
+  AccountNumberDto,
+  BvnDto,
+} from 'src/banking/dto/banking.dto';
 
+import { NGN } from '@dinero.js/currencies';
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { AccountStatus, AccountType } from '@prisma/client';
 
+const accountTypes: AccountType[] = ['Current', 'Fixed', 'Savings'];
+const bankNames = ['Access Bank', 'First Bank', 'Kuda Bank', 'OPay'];
+const currencyCode = NGN.code;
+const numberOfAccounts = 3;
+
 @Injectable()
 export class BankingProvider {
-  static NUMBER_OF_ACCOUNTS = 3;
-  static ACCOUNT_TYPES: AccountType[] = ['Current', 'Fixed', 'Savings'];
-  static BANK_NAMES = [
-    'Access Bank',
-    'CitiBank',
-    'Ecobank',
-    'First Bank',
-    'Guaranty Trust Bank',
-    'Kuda Bank',
-    'Moniepoint',
-    'OPay',
-    'Palmpay',
-    'United Bank of Africa',
-    'Wema Bank',
-    'Zenith Bank',
-  ];
-  static CURRENCY: Dinero.Currency = 'NGN';
+  async getAccountsLinkedToBvn(bvnDto: BvnDto) {
+    faker.seed(Number(bvnDto.bvn));
+    seedrandom(Number(bvnDto.bvn));
 
-  async getAccountsLinkedToUser(id: string, bvn: string) {
-    faker.seed(Number(bvn));
-    seedrandom(Number(bvn));
-
-    const accountsLinkedToUser: AccountDto[] = [];
-    for (let i = 0; i < BankingProvider.NUMBER_OF_ACCOUNTS; i++) {
-      const type: AccountType = faker.helpers.arrayElement(
-        BankingProvider.ACCOUNT_TYPES,
-      );
-      const bankName = faker.helpers.arrayElement(BankingProvider.BANK_NAMES);
+    const accountsLinkedToBvn: AccountDto[] = [];
+    for (let i = 0; i < numberOfAccounts; i++) {
+      const type: AccountType = faker.helpers.arrayElement(accountTypes);
+      const bankName = faker.helpers.arrayElement(bankNames);
       const status: AccountStatus = Math.random() < 0.9 ? 'Active' : 'Dormant';
-      const balance = Dinero({
-        amount: parseInt(
-          faker.finance.amount({ min: 100000, max: 1000000 }),
-          10,
-        ),
-        currency: BankingProvider.CURRENCY,
-      }).getAmount();
+      const number = faker.finance.accountNumber(10);
+      const openingDate = faker.date.past({ years: i + 1 });
 
       const account: AccountDto = {
-        number: faker.finance.accountNumber(10),
-        openingDate: faker.date.past({ years: i + 1 }),
-        balance,
+        number,
+        openingDate,
         bankName,
         type,
-        currency: BankingProvider.CURRENCY,
+        currencyCode,
         status,
-        userId: id,
       };
-      accountsLinkedToUser.push(account);
+      accountsLinkedToBvn.push(account);
     }
 
-    return accountsLinkedToUser;
+    return accountsLinkedToBvn;
+  }
+
+  async getAccountsBalances(
+    bvnDto: BvnDto,
+    accountNumbers: AccountNumberDto[],
+  ) {
+    const accountsBalances = [];
+    for (const accountNumber of accountNumbers) {
+      faker.seed(Number(bvnDto.bvn) + Number(accountNumber));
+      accountsBalances.push(
+        dinero({
+          amount: parseInt(faker.finance.amount()),
+          currency: NGN,
+        }),
+      );
+    }
+
+    return accountsBalances;
   }
 
   async getPhoneLinkedToBvn(bvnDto: BvnDto) {
     faker.seed(Number(bvnDto.bvn));
-
     const phoneLinkedToBvn = `+234-${faker.phone.number()}`.replace('-', '');
     return { phone: phoneLinkedToBvn };
   }

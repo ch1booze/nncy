@@ -1,14 +1,6 @@
 import { User } from 'src/utils/user.decorator';
 
-import {
-  Body,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import type {
@@ -61,10 +53,5 @@ export class AuthController {
   @Patch('verify-reset-password')
   async verifyResetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return await this.authService.verifyResetPassword(resetPasswordDto);
-  }
-
-  @Get('test')
-  async test() {
-    throw new InternalServerErrorException('Teeeeeeeeessssssssssssssst');
   }
 }
