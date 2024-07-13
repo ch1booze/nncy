@@ -1,9 +1,13 @@
 import { dinero } from 'dinero.js';
+import { DateTime } from 'luxon';
 import * as seedrandom from 'seedrandom';
 import {
   AccountDto,
   AccountNumberDto,
   BvnDto,
+  TransactionDto,
+  TransactionFilters,
+  TransactionType,
 } from 'src/banking/dto/banking.dto';
 
 import { NGN } from '@dinero.js/currencies';
@@ -66,5 +70,61 @@ export class BankingProvider {
     faker.seed(Number(bvnDto.bvn));
     const phoneLinkedToBvn = `+234-${faker.phone.number()}`.replace('-', '');
     return { phone: phoneLinkedToBvn };
+  }
+
+  async getTransactions(
+    bvnDto: BvnDto,
+    transactionsFilters: TransactionFilters,
+  ) {
+    faker.seed(Number(bvnDto.bvn));
+    seedrandom(Number(bvnDto.bvn));
+
+    const today = DateTime.now().toISODate();
+    const beginning = '2001-01-01';
+    const endDate = DateTime.fromISO(transactionsFilters.endDate ?? today);
+    const startDate = DateTime.fromISO(
+      transactionsFilters.startDate ?? beginning,
+    );
+
+    const transactions: TransactionDto[] = [];
+
+    const { days } = endDate.diff(startDate, 'days').toObject();
+    for (let day = 0; day < days; day++) {
+      const numberOfTransactions = Math.floor(Math.random() * 5) + 1;
+      for (let i = 0; i < numberOfTransactions; i++) {
+        const transactionId = faker.string.uuid();
+        const timestamp = endDate.minus({ hours: i, minutes: i }).toISO();
+        const amount = dinero({
+          amount: parseInt(
+            faker.finance.amount({
+              min: transactionsFilters.minAmount ?? 1000,
+              max: transactionsFilters.maxAmount ?? 10000,
+            }),
+          ),
+          currency: NGN,
+        });
+        const transactionType =
+          transactionsFilters.transactionType ??
+          faker.helpers.arrayElement(Object.values(TransactionType));
+        const description = faker.finance.transactionDescription();
+        const accountNumber = faker.helpers.arrayElement(
+          transactionsFilters.accountNumbers,
+        );
+        const balanceAfter = dinero({
+          amount: parseInt(faker.finance.amount()),
+          currency: NGN,
+        });
+
+        transactions.push({
+          transactionId,
+          timestamp,
+          amount,
+          transactionType,
+          description,
+          accountNumber,
+          balanceAfter,
+        });
+      }
+    }
   }
 }

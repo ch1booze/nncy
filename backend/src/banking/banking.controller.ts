@@ -10,11 +10,16 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
 import { AccountService } from './banking.service';
-import { AccountNumberDto, BvnDto } from './dto/banking.dto';
+import {
+  AccountNumberDto,
+  BvnDto,
+  TransactionFilters,
+} from './dto/banking.dto';
 
 @Controller('banking')
 @UseGuards(JwtAuthGuard)
@@ -63,5 +68,13 @@ export class BankingController {
     @Body() accountNumbers: AccountNumberDto[],
   ) {
     return await this.bankingService.getAccountsBalances(user, accountNumbers);
+  }
+
+  @Get('get-transactions')
+  async getTransactions(
+    @User() user: PayloadDto,
+    @Query() transactionFilters: TransactionFilters,
+  ) {
+    return await this.bankingService.getTransactions(user, transactionFilters);
   }
 }

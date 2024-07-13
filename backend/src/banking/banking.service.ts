@@ -10,15 +10,16 @@ import {
 import { ResponseDto } from 'src/utils/response.dto';
 import {
   ACCOUNT_IS_RETRIEVED,
-  ACCOUNTS_BALANCES_ARE_RETRIEVED,
   ACCOUNTS_ARE_LINKED,
   ACCOUNTS_ARE_RETRIEVED,
+  ACCOUNTS_BALANCES_ARE_RETRIEVED,
   BVN_IS_VERIFIED,
   BVN_NOT_VERIFIED,
   EMAIL_NOT_VERIFIED,
   LINKED_ACCOUNTS_ARE_RETRIEVED,
   OTP_NOT_VALID,
   SMS_IS_SENT,
+  TRANSACTIONS_ARE_RETRIEVED,
   USER_NOT_FOUND,
 } from 'src/utils/response.types';
 
@@ -29,6 +30,7 @@ import {
   accountSummary,
   BvnDto,
   PhoneDto,
+  TransactionFilters,
 } from './dto/banking.dto';
 
 @Injectable()
@@ -195,5 +197,28 @@ export class AccountService {
     });
 
     return ResponseDto.generateResponse(ACCOUNT_IS_RETRIEVED, foundAccount);
+  }
+
+  async getTransactions(
+    user: PayloadDto,
+    transactionFilters: TransactionFilters,
+  ) {
+    const foundUser = await this.databaseProvider.user.findUnique({
+      where: { id: user.id },
+    });
+    if (!foundUser) {
+      return ResponseDto.generateResponse(USER_NOT_FOUND);
+    }
+
+    const bvnDto: BvnDto = { bvn: foundUser.bvn };
+    const transactions = this.bankingProvider.getTransactions(
+      bvnDto,
+      transactionFilters,
+    );
+
+    return ResponseDto.generateResponse(
+      TRANSACTIONS_ARE_RETRIEVED,
+      transactions,
+    );
   }
 }

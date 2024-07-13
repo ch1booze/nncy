@@ -9,6 +9,10 @@ Done:
     ✔ Abstract Otp generation so it is applicable easily to the resetting of password. @done(24-07-10 15:24)
 
 ToDo:
+    ☐ Implement getting of transactions pertaining to a user.
+    ☐ Implement getting of transactions pertaining to a user's account.
+
+Later:
     ☐ Implement testing framework.
     ☐ Implement a logger service to log exceptions.
     ☐ Look into how banks ensure security of sensitive information.
