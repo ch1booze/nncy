@@ -1,21 +1,15 @@
-import { BankingProvider } from 'src/providers/banking.provider';
-import { OtpProvider } from 'src/providers/otp.provider';
-import { DatabaseProvider } from 'src/providers/database.provider';
-import { SmsProvider } from 'src/providers/sms.provider';
+import { DatabaseModule } from 'src/database/database.module';
+import { MessagingModule } from 'src/messaging/messaging.module';
+import { ObpModule } from 'src/obp/obp.module';
 
 import { Module } from '@nestjs/common';
 
 import { BankingController } from './banking.controller';
-import { AccountService } from './banking.service';
+import { BankingService } from './banking.service';
 
 @Module({
+  imports: [DatabaseModule, MessagingModule, ObpModule],
   controllers: [BankingController],
-  providers: [
-    AccountService,
-    BankingProvider,
-    DatabaseProvider,
-    OtpProvider,
-    SmsProvider,
-  ],
+  providers: [BankingService],
 })
 export class BankingModule {}

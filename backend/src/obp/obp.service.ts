@@ -6,10 +6,10 @@ import {
   AccountNumberDto,
   BvnDto,
   TransactionDto,
-  TransactionFilters,
+  TransactionFilterParams,
   TransactionType,
   TransferAccountDto,
-} from 'src/banking/dto/banking.dto';
+} from 'src/banking/dto';
 
 import { NGN } from '@dinero.js/currencies';
 import { faker } from '@faker-js/faker';
@@ -20,9 +20,12 @@ const accountTypes: AccountType[] = ['Current', 'Fixed', 'Savings'];
 const bankNames = ['Access Bank', 'First Bank', 'Kuda Bank', 'OPay'];
 const currencyCode = NGN.code;
 const numberOfAccounts = 3;
+const numberOfTransactionsPerDay = 3;
+const minAmount = 1000;
+const maxAmount = 10000;
 
 @Injectable()
-export class BankingProvider {
+export class ObpService {
   async getAccountsLinkedToBvn(bvnDto: BvnDto) {
     faker.seed(Number(bvnDto.bvn));
     seedrandom(Number(bvnDto.bvn));
@@ -58,7 +61,9 @@ export class BankingProvider {
       faker.seed(Number(bvnDto.bvn) + Number(number));
       accountsBalances.push(
         dinero({
-          amount: parseInt(faker.finance.amount({ min: 10000, max: 100000 })),
+          amount: parseInt(
+            faker.finance.amount({ min: minAmount, max: maxAmount }),
+          ),
           currency: NGN,
         }),
       );
@@ -75,49 +80,46 @@ export class BankingProvider {
 
   async getTransactions(
     bvnDto: BvnDto,
-    transactionsFilters: TransactionFilters,
+    transactionsFilterParams: TransactionFilterParams,
   ) {
     faker.seed(Number(bvnDto.bvn));
     seedrandom(Number(bvnDto.bvn));
 
     const today = DateTime.now().toISODate();
-    // const beginning = '2001-01-01';
-    const endDate = DateTime.fromISO(transactionsFilters.endDate ?? today);
-    // const startDate = DateTime.fromISO(
-    //   transactionsFilters.startDate ?? beginning,
-    // );
+    const endDate = DateTime.fromISO(transactionsFilterParams.endDate ?? today);
 
     const transactions: TransactionDto[] = [];
-
     const days = 10;
     for (let day = 0; day < days; day++) {
-      const numberOfTransactions = Math.floor(Math.random() * 3) + 1;
+      const numberOfTransactions =
+        Math.floor(Math.random() * numberOfTransactionsPerDay) + 1;
       for (let i = 0; i < numberOfTransactions; i++) {
         const transactionId = faker.string.uuid();
         const timestamp = endDate.minus({ hours: i, minutes: i }).toISO();
         const amount = dinero({
           amount: parseInt(
             faker.finance.amount({
-              min: transactionsFilters.minAmount ?? 1000,
-              max: transactionsFilters.maxAmount ?? 10000,
+              min: transactionsFilterParams.minAmount ?? minAmount,
+              max: transactionsFilterParams.maxAmount ?? maxAmount,
             }),
           ),
           currency: NGN,
         });
         const transactionType =
-          transactionsFilters.transactionType ??
-          faker.helpers.arrayElement(Object.values(TransactionType));
+          transactionsFilterParams.transactionType ??
+          (faker.helpers.arrayElement(
+            Object.values(TransactionType),
+          ) as TransactionType);
         const description = faker.finance.transactionDescription();
         const accountNumber = faker.helpers.arrayElement(
-          transactionsFilters.accountNumbers,
+          transactionsFilterParams.accountNumbers,
         );
-
         const balanceAfter = dinero({
           amount: parseInt(faker.finance.amount()),
           currency: NGN,
         });
 
-        transactions.push({
+        const transaction: TransactionDto = {
           transactionId,
           timestamp,
           amount,
@@ -125,7 +127,8 @@ export class BankingProvider {
           description,
           accountNumber,
           balanceAfter,
-        });
+        };
+        transactions.push(transaction);
       }
     }
 

@@ -7,7 +7,18 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
-import { Match } from 'src/utils/match.decorator';
+import { Match } from 'src/user/match.decorator';
+
+/** Password must:
+ * contain at least one uppercase letter,
+ * one lowercase letter,
+ * one number,
+ * one special character and,
+ * must be at least 8 characters long.*/
+const passwordPattern = /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}$/;
+
+const minPasswordLength = 8;
+const tokenLength = 6;
 
 export class SignupDto {
   @IsString()
@@ -24,14 +35,8 @@ export class SignupDto {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(8)
-  /** Password must:
-   * contain at least one uppercase letter,
-   * one lowercase letter,
-   * one number,
-   * one special character and,
-   * must be at least 8 characters long.*/
-  @Matches(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}$/)
+  @MinLength(minPasswordLength)
+  @Matches(passwordPattern)
   password: string;
 
   @IsString()
@@ -65,7 +70,7 @@ export class EmailDto {
 export class TokenDto {
   @IsNumberString()
   @IsNotEmpty()
-  @Length(6)
+  @Length(tokenLength)
   token: string;
 }
 
@@ -76,13 +81,13 @@ export class ResetPasswordDto {
 
   @IsNumberString()
   @IsNotEmpty()
-  @Length(6)
+  @Length(tokenLength)
   token: string;
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(8)
-  @Matches(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}$/)
+  @MinLength(minPasswordLength)
+  @Matches(passwordPattern)
   password: string;
 
   @IsString()
@@ -90,21 +95,3 @@ export class ResetPasswordDto {
   @Match('password')
   confirmPassword: string;
 }
-
-interface ProfileInclusionFields {
-  email: boolean;
-  firstName: boolean;
-  lastName: boolean;
-  isEmailVerified: boolean;
-  isBvnVerified: boolean;
-  dateOfBirth: boolean;
-}
-
-export const profileInclusionFields: ProfileInclusionFields = {
-  email: true,
-  firstName: true,
-  lastName: true,
-  isEmailVerified: true,
-  isBvnVerified: true,
-  dateOfBirth: true,
-};

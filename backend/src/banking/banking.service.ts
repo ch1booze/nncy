@@ -1,129 +1,110 @@
-import { PayloadDto, TokenDto } from 'src/auth/dto';
-import { BankingProvider } from 'src/providers/banking.provider';
-import { DatabaseProvider } from 'src/providers/database.provider';
-import { OtpDto, OtpProvider } from 'src/providers/otp.provider';
-import {
-  SendSmsDto,
-  SmsProvider,
-  SmsTemplate,
-} from 'src/providers/sms.provider';
-import { ResponseDto } from 'src/utils/response.dto';
-import {
-  ACCOUNT_DETAILS_IS_RETRIEVED,
-  ACCOUNT_IS_RETRIEVED,
-  ACCOUNTS_ARE_LINKED,
-  ACCOUNTS_ARE_RETRIEVED,
-  ACCOUNTS_BALANCES_ARE_RETRIEVED,
-  BVN_IS_VERIFIED,
-  BVN_NOT_VERIFIED,
-  EMAIL_NOT_VERIFIED,
-  LINKED_ACCOUNTS_ARE_RETRIEVED,
-  OTP_NOT_VALID,
-  SMS_IS_SENT,
-  TRANSACTIONS_ARE_RETRIEVED,
-  USER_NOT_FOUND,
-} from 'src/utils/response.types';
+import { DatabaseService } from 'src/database/database.service';
+import { MessageDto, OtpDto, OtpNotValid, Template } from 'src/messaging/dto';
+import { MessagingService } from 'src/messaging/messaging.service';
+import { ObpService } from 'src/obp/obp.service';
+import { ResponseDto } from 'src/response/response.dto';
+import { EmailNotVerified, PayloadDto, TokenDto } from 'src/user/dto';
 
 import { Injectable } from '@nestjs/common';
 
 import {
+  AccountDetailsIsRetrieved,
+  AccountIsRetrieved,
   AccountNumberDto,
-  accountSummary,
+  AccountsAreLinked,
+  AccountsBalancesAreRetrieved,
+  AccountsSummaryAreRetrieved,
   BvnDto,
+  BvnIsVerified,
+  BvnNotVerified,
+  LinkedAccountsAreRetrieved,
   PhoneDto,
-  TransactionFilters,
-} from './dto/banking.dto';
+  TransactionFilterParams,
+  TransactionsAreRetrieved,
+} from './dto';
 
 @Injectable()
-export class AccountService {
+export class BankingService {
   constructor(
-    private bankingProvider: BankingProvider,
-    private databaseProvider: DatabaseProvider,
-    private smsProvider: SmsProvider,
-    private otpProvider: OtpProvider,
+    private databaseService: DatabaseService,
+    private messagingService: MessagingService,
+    private obpService: ObpService,
   ) {}
 
   async sendBvnVerification(user: PayloadDto, bvnDto: BvnDto) {
-    const foundUser = await this.databaseProvider.user.findUnique({
+    const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser.isEmailVerified) {
-      return ResponseDto.generateResponse(EMAIL_NOT_VERIFIED);
+      return ResponseDto.generateResponse(EmailNotVerified);
     }
 
     const phoneDto: PhoneDto =
-      await this.bankingProvider.getPhoneLinkedToBvn(bvnDto);
-    const otpDto: OtpDto = await this.otpProvider.generateOtp();
-    await this.databaseProvider.user.update({
+      await this.obpService.getPhoneLinkedToBvn(bvnDto);
+    const otpDto: OtpDto = await this.messagingService.generateOtp();
+    await this.databaseService.user.update({
       where: { id: user.id },
       data: { secret: otpDto.secret },
     });
 
-    const sendSmsDto: SendSmsDto = {
+    const sendSmsDto: MessageDto = {
       name: `${foundUser.firstName} ${foundUser.lastName}`,
-      phone: phoneDto.phone,
       token: otpDto.token,
-      smsTemplate: SmsTemplate.BVN_VERIFICATION,
+      template: Template.BVN_VERIFICATION,
+      contact: phoneDto.phone,
     };
-    const sentSms = await this.smsProvider.sendSms(sendSmsDto);
 
-    return ResponseDto.generateResponse(SMS_IS_SENT, sentSms);
+    return await this.messagingService.sendSms(sendSmsDto);
   }
 
   async verifyBvn(user: PayloadDto, tokenDto: TokenDto) {
-    const foundUser = await this.databaseProvider.user.findUnique({
+    const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
-    if (!foundUser) {
-      return ResponseDto.generateResponse(USER_NOT_FOUND);
-    }
 
     const otpDto: OtpDto = {
       secret: foundUser.secret,
       token: tokenDto.token,
     };
-    const isValidatedOtp = await this.otpProvider.validateOtp(otpDto);
+    const isValidatedOtp = await this.messagingService.validateOtp(otpDto);
     if (!isValidatedOtp) {
-      return ResponseDto.generateResponse(OTP_NOT_VALID);
+      return ResponseDto.generateResponse(OtpNotValid);
     }
 
-    await this.databaseProvider.user.update({
+    await this.databaseService.user.update({
       where: { id: user.id },
       data: { isBvnVerified: true },
     });
 
-    return ResponseDto.generateResponse(BVN_IS_VERIFIED);
+    return ResponseDto.generateResponse(BvnIsVerified);
   }
 
   async getAccountsLinkedToBvn(user: PayloadDto) {
-    const foundUser = await this.databaseProvider.user.findUnique({
+    const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
     if (!foundUser.isBvnVerified) {
-      return ResponseDto.generateResponse(BVN_NOT_VERIFIED);
+      return ResponseDto.generateResponse(BvnNotVerified);
     }
 
     const bvnDto: BvnDto = { bvn: foundUser.bvn };
     const accountsLinkedToBvn =
-      await this.bankingProvider.getAccountsLinkedToBvn(bvnDto);
+      await this.obpService.getAccountsLinkedToBvn(bvnDto);
 
     return ResponseDto.generateResponse(
-      LINKED_ACCOUNTS_ARE_RETRIEVED,
+      LinkedAccountsAreRetrieved,
       accountsLinkedToBvn,
     );
   }
 
   async linkAccounts(user: PayloadDto, accountNumbers: AccountNumberDto[]) {
-    const foundUser = await this.databaseProvider.user.findUnique({
+    const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
-    if (!foundUser) {
-      return ResponseDto.generateResponse(USER_NOT_FOUND);
-    }
 
     const bvnDto: BvnDto = { bvn: foundUser.bvn };
     const accountsLinkedToBvn =
-      await this.bankingProvider.getAccountsLinkedToBvn(bvnDto);
+      await this.obpService.getAccountsLinkedToBvn(bvnDto);
 
     const accounts = accountsLinkedToBvn
       .filter((account) =>
@@ -136,120 +117,92 @@ export class AccountService {
         };
       });
 
-    await this.databaseProvider.account.createMany({
+    await this.databaseService.account.createMany({
       data: accounts,
       skipDuplicates: true,
     });
 
-    return ResponseDto.generateResponse(ACCOUNTS_ARE_LINKED);
+    return ResponseDto.generateResponse(AccountsAreLinked);
   }
 
   async getAccountsBalances(
     user: PayloadDto,
     accountNumbers: AccountNumberDto[],
   ) {
-    const foundUser = await this.databaseProvider.user.findUnique({
+    const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
-    if (!foundUser) {
-      return ResponseDto.generateResponse(USER_NOT_FOUND);
-    }
 
     const bvnDto: BvnDto = { bvn: foundUser.bvn };
-    const accountsBalances = await this.bankingProvider.getAccountsBalances(
+    const accountsBalances = await this.obpService.getAccountsBalances(
       bvnDto,
       accountNumbers,
     );
 
     return ResponseDto.generateResponse(
-      ACCOUNTS_BALANCES_ARE_RETRIEVED,
+      AccountsBalancesAreRetrieved,
       accountsBalances,
     );
   }
 
   async getAccountsSummary(user: PayloadDto) {
-    const foundUser = await this.databaseProvider.user.findUnique({
-      where: { id: user.id },
-    });
-    if (!foundUser) {
-      return ResponseDto.generateResponse(USER_NOT_FOUND);
-    }
-
-    const foundAccounts = await this.databaseProvider.account.findMany({
+    const AccountSummarySelectList = ['bankName', 'number', 'currencyCode'];
+    const AccountSummarySelectFields =
+      await this.databaseService.getSelectFields(AccountSummarySelectList);
+    const foundAccounts = await this.databaseService.account.findMany({
       where: { userId: user.id },
-      select: accountSummary,
+      select: AccountSummarySelectFields,
     });
 
-    return ResponseDto.generateResponse(ACCOUNTS_ARE_RETRIEVED, foundAccounts);
+    return ResponseDto.generateResponse(
+      AccountsSummaryAreRetrieved,
+      foundAccounts,
+    );
   }
 
   async getAccountById(user: PayloadDto, index: number) {
-    const foundUser = await this.databaseProvider.user.findUnique({
-      where: { id: user.id },
-    });
-    if (!foundUser) {
-      return ResponseDto.generateResponse(USER_NOT_FOUND);
-    }
-
-    const foundAccount = await this.databaseProvider.account.findFirst({
+    const foundAccount = await this.databaseService.account.findFirst({
       where: { userId: user.id },
       skip: index,
       take: 1,
     });
 
-    return ResponseDto.generateResponse(ACCOUNT_IS_RETRIEVED, foundAccount);
+    return ResponseDto.generateResponse(AccountIsRetrieved, foundAccount);
   }
 
   async getTransactions(
     user: PayloadDto,
-    transactionFilters: TransactionFilters,
+    transactionFilterParams: TransactionFilterParams,
   ) {
-    const foundUser = await this.databaseProvider.user.findUnique({
+    const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
-    if (!foundUser) {
-      return ResponseDto.generateResponse(USER_NOT_FOUND);
-    }
-
-    const foundAccountNumbers = await this.databaseProvider.account.findMany({
+    const foundAccountNumbers = await this.databaseService.account.findMany({
       where: { userId: user.id },
       select: { number: true },
     });
 
-    transactionFilters.accountNumbers =
-      transactionFilters.accountNumbers === undefined
+    transactionFilterParams.accountNumbers =
+      transactionFilterParams.accountNumbers === undefined
         ? foundAccountNumbers
-        : transactionFilters.accountNumbers;
+        : transactionFilterParams.accountNumbers;
 
     const bvnDto: BvnDto = { bvn: foundUser.bvn };
-    const transactions = await this.bankingProvider.getTransactions(
+    const transactions = await this.obpService.getTransactions(
       bvnDto,
-      transactionFilters,
+      transactionFilterParams,
     );
 
-    return ResponseDto.generateResponse(
-      TRANSACTIONS_ARE_RETRIEVED,
-      transactions,
-    );
+    return ResponseDto.generateResponse(TransactionsAreRetrieved, transactions);
   }
 
-  async getAccountDetails(
-    user: PayloadDto,
-    transferAccountNumberDto: AccountNumberDto,
-  ) {
-    const foundUser = await this.databaseProvider.user.findUnique({
-      where: { id: user.id },
-    });
-    if (!foundUser) {
-      return ResponseDto.generateResponse(USER_NOT_FOUND);
-    }
-
-    const transferAccountDetails = await this.bankingProvider.getAccountDetails(
+  async getAccountDetails(transferAccountNumberDto: AccountNumberDto) {
+    const transferAccountDetails = await this.obpService.getAccountDetails(
       transferAccountNumberDto,
     );
 
     return ResponseDto.generateResponse(
-      ACCOUNT_DETAILS_IS_RETRIEVED,
+      AccountDetailsIsRetrieved,
       transferAccountDetails,
     );
   }

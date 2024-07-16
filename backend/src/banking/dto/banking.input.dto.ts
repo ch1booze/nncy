@@ -112,6 +112,9 @@ export class TransferFundsDto {
   @IsNotEmpty()
   transferAccountName: string;
 
+  @IsNotEmpty()
+  transferAccountNumber: AccountNumberDto;
+
   @IsIBAN()
   @IsNotEmpty()
   transferBankCode: string;
@@ -124,15 +127,17 @@ export class TransferFundsDto {
   description: string;
 
   @IsNotEmpty()
-  accountNumber: AccountNumberDto;
+  primaryAccount: AccountNumberDto;
+
+  secondaryAccounts?: AccountNumberDto;
 }
 
 export enum TransactionType {
-  Credit = 'Credit',
-  Debit = 'Debit',
+  Credit,
+  Debit,
 }
 
-export class TransactionFilters {
+export class TransactionFilterParams {
   accountNumbers?: AccountNumberDto[];
 
   @IsDateString()
@@ -149,15 +154,3 @@ export class TransactionFilters {
 
   transactionType?: TransactionType;
 }
-
-interface AccountSummary {
-  bankName: boolean;
-  number: boolean;
-  currencyCode: boolean;
-}
-
-export const accountSummary: AccountSummary = {
-  bankName: true,
-  number: true,
-  currencyCode: true,
-};

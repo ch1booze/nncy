@@ -1,18 +1,18 @@
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { ResponseDto } from 'src/utils/response.dto';
-import {
-  TOKEN_NOT_FOUND,
-  USER_IS_AUTHORIZED,
-  USER_NOT_AUTHORIZED,
-} from 'src/utils/response.types';
+import { ResponseDto } from 'src/response/response.dto';
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { PayloadDto } from './dto';
+import {
+  PayloadDto,
+  TokenNotFound,
+  UserIsAuthorized,
+  UserNotAuthorized,
+} from './dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -31,15 +31,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(req: Request) {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
     if (!token) {
-      return ResponseDto.generateResponse(TOKEN_NOT_FOUND);
+      return ResponseDto.generateResponse(TokenNotFound);
     }
 
     const verifiedPayload = await this.jwtService.verifyAsync(token);
     if (!verifiedPayload) {
-      return ResponseDto.generateResponse(USER_NOT_AUTHORIZED);
+      return ResponseDto.generateResponse(UserNotAuthorized);
     }
 
     const user: PayloadDto = verifiedPayload;
-    return ResponseDto.generateResponse(USER_IS_AUTHORIZED, user);
+    return ResponseDto.generateResponse(UserIsAuthorized, user);
   }
 }

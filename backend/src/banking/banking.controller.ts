@@ -1,6 +1,6 @@
-import { PayloadDto, TokenDto } from 'src/auth/dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { User } from 'src/utils/user.decorator';
+import { PayloadDto, TokenDto } from 'src/user/dto';
+import { JwtAuthGuard } from 'src/user/jwt-auth.guard';
+import { User } from 'src/user/user.decorator';
 
 import {
   Body,
@@ -14,17 +14,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { AccountService } from './banking.service';
-import {
-  AccountNumberDto,
-  BvnDto,
-  TransactionFilters,
-} from './dto/banking.dto';
+import { BankingService } from './banking.service';
+import { AccountNumberDto, BvnDto, TransactionFilterParams } from './dto';
 
 @Controller('banking')
 @UseGuards(JwtAuthGuard)
 export class BankingController {
-  constructor(private readonly bankingService: AccountService) {}
+  constructor(private readonly bankingService: BankingService) {}
 
   @Post('send-bvn-verification')
   async sendBvnVerification(@User() user: PayloadDto, @Body() bvnDto: BvnDto) {
@@ -49,8 +45,8 @@ export class BankingController {
     return await this.bankingService.linkAccounts(user, accountNumbers);
   }
 
-  @Get('get-accounts')
-  async getAccounts(@User() user: PayloadDto) {
+  @Get('get-accounts-summary')
+  async getAccountsSummary(@User() user: PayloadDto) {
     return await this.bankingService.getAccountsSummary(user);
   }
 
@@ -73,18 +69,19 @@ export class BankingController {
   @Get('get-transactions')
   async getTransactions(
     @User() user: PayloadDto,
-    @Query() transactionFilters: TransactionFilters,
+    @Query() transactionFilterParams: TransactionFilterParams,
   ) {
-    return await this.bankingService.getTransactions(user, transactionFilters);
+    return await this.bankingService.getTransactions(
+      user,
+      transactionFilterParams,
+    );
   }
 
   @Post('get-transfer-account-details')
   async getTransferAccountDetails(
-    @User() user: PayloadDto,
     @Body() transferAccountNumberDto: AccountNumberDto,
   ) {
     return await this.bankingService.getAccountDetails(
-      user,
       transferAccountNumberDto,
     );
   }
