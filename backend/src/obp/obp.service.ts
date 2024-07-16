@@ -7,14 +7,13 @@ import {
   BvnDto,
   TransactionDto,
   TransactionFilterParams,
-  TransactionType,
   TransferAccountDto,
 } from 'src/banking/dto';
 
 import { NGN } from '@dinero.js/currencies';
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
-import { AccountStatus, AccountType } from '@prisma/client';
+import { AccountStatus, AccountType, TransactionType } from '@prisma/client';
 
 const accountTypes: AccountType[] = ['Current', 'Fixed', 'Savings'];
 const bankNames = ['Access Bank', 'First Bank', 'Kuda Bank', 'OPay'];
@@ -74,7 +73,7 @@ export class ObpService {
 
   async getPhoneLinkedToBvn(bvnDto: BvnDto) {
     faker.seed(Number(bvnDto.bvn));
-    const phoneLinkedToBvn = `+234-${faker.phone.number()}`.replace('-', '');
+    const phoneLinkedToBvn = `234-${faker.phone.number()}`.replace('-', '');
     return { phone: phoneLinkedToBvn };
   }
 
@@ -105,11 +104,9 @@ export class ObpService {
           ),
           currency: NGN,
         });
-        const transactionType =
+        const transactionType: TransactionType =
           transactionsFilterParams.transactionType ??
-          (faker.helpers.arrayElement(
-            Object.values(TransactionType),
-          ) as TransactionType);
+          faker.helpers.arrayElement(['Credit', 'Debit']);
         const description = faker.finance.transactionDescription();
         const accountNumber = faker.helpers.arrayElement(
           transactionsFilterParams.accountNumbers,

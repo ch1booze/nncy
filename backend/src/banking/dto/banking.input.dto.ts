@@ -12,7 +12,7 @@ import {
   Length,
 } from 'class-validator';
 
-import { AccountStatus, AccountType } from '@prisma/client';
+import { AccountStatus, AccountType, TransactionType } from '@prisma/client';
 import { Dinero } from 'dinero.js';
 
 export class AccountDto {
@@ -63,7 +63,7 @@ export class BvnDto {
 
 export class PhoneDto {
   @IsNumberString()
-  @Length(11)
+  @Length(13)
   phone: string;
 }
 
@@ -130,11 +130,6 @@ export class TransferFundsDto {
   primaryAccount: AccountNumberDto;
 
   secondaryAccounts?: AccountNumberDto;
-}
-
-export enum TransactionType {
-  Credit,
-  Debit,
 }
 
 export class TransactionFilterParams {

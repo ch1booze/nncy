@@ -7,7 +7,6 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
-import { Match } from 'src/user/match.decorator';
 
 /** Password must:
  * contain at least one uppercase letter,
@@ -38,11 +37,6 @@ export class SignupDto {
   @MinLength(minPasswordLength)
   @Matches(passwordPattern)
   password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Match('password')
-  confirmPassword: string;
 }
 
 export class LoginDto {
@@ -89,9 +83,4 @@ export class ResetPasswordDto {
   @MinLength(minPasswordLength)
   @Matches(passwordPattern)
   password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @Match('password')
-  confirmPassword: string;
 }
