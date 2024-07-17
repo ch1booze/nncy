@@ -22,7 +22,7 @@ import {
   LinkedAccountsAreRetrieved,
   NoLinkedAccounts,
   PhoneDto,
-  TransactionFilterParams,
+  TransactionFilterDto,
   TransactionsAreRetrieved,
   TransferFundsDto,
 } from './dto';
@@ -182,7 +182,7 @@ export class BankingService {
 
   async getTransactions(
     user: PayloadDto,
-    transactionFilterParams: TransactionFilterParams,
+    TransactionFilterDto: TransactionFilterDto,
   ) {
     const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
@@ -205,15 +205,15 @@ export class BankingService {
       accountNumbers.push(account.number);
     }
 
-    transactionFilterParams.accountNumbers =
-      transactionFilterParams.accountNumbers === undefined
+    TransactionFilterDto.accountNumbers =
+      TransactionFilterDto.accountNumbers === undefined
         ? accountNumbers
-        : transactionFilterParams.accountNumbers;
+        : TransactionFilterDto.accountNumbers;
 
     const bvnDto: BvnDto = { bvn: foundUser.bvn };
     const transactions = await this.obpService.getTransactions(
       bvnDto,
-      transactionFilterParams,
+      TransactionFilterDto,
     );
 
     return ResponseDto.generateResponse(TransactionsAreRetrieved, transactions);

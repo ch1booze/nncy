@@ -30,6 +30,10 @@ export class AccountDto {
   @IsNotEmpty()
   status: AccountStatus;
 
+  @IsIBAN()
+  @IsNotEmpty()
+  bankCode: string;
+
   @IsDate()
   @IsNotEmpty()
   openingDate: Date;
@@ -150,7 +154,7 @@ export class TransferFundsDto {
   secondaryAccountNumbers?: string[];
 }
 
-export class TransactionFilterParams {
+export class TransactionFilterDto {
   @IsArray()
   @ValidateNested({ each: true })
   @IsNumberString()

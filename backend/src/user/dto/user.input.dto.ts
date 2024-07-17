@@ -5,7 +5,6 @@ import {
   IsString,
   IsStrongPassword,
   Length,
-  ValidateIf,
 } from 'class-validator';
 
 const tokenLength = 6;
@@ -27,11 +26,6 @@ export class SignupDto {
   @IsNotEmpty()
   @IsStrongPassword()
   password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ValidateIf((o) => o.password === o.confirmPassword)
-  confirmPassword: string;
 }
 
 export class LoginDto {
@@ -77,9 +71,4 @@ export class ResetPasswordDto {
   @IsNotEmpty()
   @IsStrongPassword()
   password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ValidateIf((o) => o.password === o.confirmPassword)
-  confirmPassword: string;
 }

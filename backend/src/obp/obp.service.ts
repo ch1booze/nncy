@@ -6,7 +6,7 @@ import {
   AccountNumberDto,
   BvnDto,
   TransactionDto,
-  TransactionFilterParams,
+  TransactionFilterDto,
   TransactionType,
   TransferAccountDto,
 } from 'src/banking/dto';
@@ -37,6 +37,7 @@ export class ObpService {
       const status: AccountStatus = Math.random() < 0.9 ? 'Active' : 'Dormant';
       const number = faker.finance.accountNumber(10);
       const openingDate = faker.date.past({ years: i + 1 });
+      const bankCode = faker.finance.iban();
 
       const account: AccountDto = {
         number,
@@ -44,6 +45,7 @@ export class ObpService {
         bankName,
         type,
         currencyCode,
+        bankCode,
         status,
       };
       accountsLinkedToBvn.push(account);
@@ -71,13 +73,13 @@ export class ObpService {
 
   async getTransactions(
     bvnDto: BvnDto,
-    transactionsFilterParams: TransactionFilterParams,
+    transactionFilterDto: TransactionFilterDto,
   ) {
     faker.seed(Number(bvnDto.bvn));
     seedrandom(Number(bvnDto.bvn));
 
     const today = DateTime.now().toISODate();
-    const endDate = DateTime.fromISO(transactionsFilterParams.endDate ?? today);
+    const endDate = DateTime.fromISO(transactionFilterDto.endDate ?? today);
 
     const transactions: TransactionDto[] = [];
     const days = 10;
@@ -90,18 +92,18 @@ export class ObpService {
         const amount = dinero({
           amount: parseInt(
             faker.finance.amount({
-              min: transactionsFilterParams.minAmount ?? minAmount,
-              max: transactionsFilterParams.maxAmount ?? maxAmount,
+              min: transactionFilterDto.minAmount ?? minAmount,
+              max: transactionFilterDto.maxAmount ?? maxAmount,
             }),
           ),
           currency: NGN,
         });
         const transactionType =
-          transactionsFilterParams.transactionType ??
+          transactionFilterDto.transactionType ??
           (faker.helpers.arrayElement(['Credit', 'Debit']) as TransactionType);
         const description = faker.finance.transactionDescription();
         const accountNumber = faker.helpers.arrayElement(
-          transactionsFilterParams.accountNumbers,
+          transactionFilterDto.accountNumbers,
         );
         const balanceAfter = dinero({
           amount: parseInt(faker.finance.amount()),

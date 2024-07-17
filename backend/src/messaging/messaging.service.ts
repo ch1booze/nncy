@@ -1,8 +1,10 @@
 import { createClient } from 'smtpexpress';
 import * as speakeasy from 'speakeasy';
 import { ResponseDto } from 'src/response/response.dto';
+
 import { Injectable, NotImplementedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import { EmailIsSent, MessageDto, OtpDto, SmsIsSent, Template } from './dto';
 
 @Injectable()
@@ -13,7 +15,6 @@ export class MessagingService {
   private senderPhone;
 
   constructor(private configService: ConfigService) {
-    console.log('Initializing MessagingService...');
     this.emailClient = createClient({
       projectId: this.configService.get<string>('SMTPEXPRESS_PROJECT_ID'),
       projectSecret: this.configService.get<string>(

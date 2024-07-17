@@ -6,7 +6,6 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   ParseIntPipe,
   Post,
   Put,
@@ -18,7 +17,7 @@ import { BankingService } from './banking.service';
 import {
   AccountNumberDto,
   BvnDto,
-  TransactionFilterParams,
+  TransactionFilterDto,
   TransferFundsDto,
 } from './dto';
 
@@ -55,10 +54,10 @@ export class BankingController {
     return await this.bankingService.getAccountsSummary(user);
   }
 
-  @Get('get-account/:index')
+  @Get('get-account')
   async getAccountByIndex(
     @User() user: PayloadDto,
-    @Param('index', ParseIntPipe) index: number,
+    @Query('index', ParseIntPipe) index: number,
   ) {
     return await this.bankingService.getAccountById(user, index);
   }
@@ -74,11 +73,11 @@ export class BankingController {
   @Get('get-transactions')
   async getTransactions(
     @User() user: PayloadDto,
-    @Query() transactionFilterParams: TransactionFilterParams,
+    @Body() transactionFilterDto: TransactionFilterDto,
   ) {
     return await this.bankingService.getTransactions(
       user,
-      transactionFilterParams,
+      transactionFilterDto,
     );
   }
 
