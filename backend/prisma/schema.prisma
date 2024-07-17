@@ -13,22 +13,22 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email     String  @unique
-  phone     String? @db.Char(13)
-  bvn       String? @unique
-  password  String
-  firstName String
-  lastName  String
+  email    String  @unique
+  phone    String? @db.Char(13)
+  bvn      String? @unique
+  secret   String?
+  password String
 
-  secret          String?
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime? @db.Date
+
   isEmailVerified Boolean @default(false)
   isPhoneVerified Boolean @default(false)
   isBvnVerified   Boolean @default(false)
 
-  dateOfBirth DateTime? @db.Date
-
-  accounts     Account[]
-  transactions Transaction[]
+  accounts Account[]
+  debts    Debit[]
 }
 
 // Account
@@ -38,15 +38,17 @@ model Account {
   type         AccountType
   status       AccountStatus
   bankName     String
+  bankCode     String
   openingDate  DateTime      @db.Date
   currencyCode String
 
   phone String? @db.Char(13)
   email String?
 
-  user        User          @relation(fields: [userId], references: [id])
-  userId      String        @db.Uuid
-  Transaction Transaction[]
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
+
+  debts Debit[]
 }
 
 enum AccountStatus {
@@ -61,23 +63,21 @@ enum AccountType {
   Fixed
 }
 
-// Transaction
-model Transaction {
+// Debit
+model Debit {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  description   String
-  type          TransactionType
-  amount        Int             @db.Integer
-  accountNumber String          @db.Char(10)
+  description           String
+  amount                Decimal @db.Money
+  transferAccountNumber String  @db.Char(10)
+  transferAccountName   String
+  transferBankCode      String
+  balanceAfter          Decimal @db.Money
 
-  user    User    @relation(fields: [userId], references: [id])
-  userId  String  @db.Uuid
-  account Account @relation(fields: [accountNumber], references: [number])
-}
-
-enum TransactionType {
-  Credit
-  Debit
+  user          User    @relation(fields: [userId], references: [id])
+  userId        String  @db.Uuid
+  account       Account @relation(fields: [accountNumber], references: [number])
+  accountNumber String  @db.Char(10)
 }

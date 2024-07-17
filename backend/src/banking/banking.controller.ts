@@ -15,7 +15,12 @@ import {
 } from '@nestjs/common';
 
 import { BankingService } from './banking.service';
-import { AccountNumberDto, BvnDto, TransactionFilterParams } from './dto';
+import {
+  AccountNumberDto,
+  BvnDto,
+  TransactionFilterParams,
+  TransferFundsDto,
+} from './dto';
 
 @Controller('banking')
 @UseGuards(JwtAuthGuard)
@@ -84,5 +89,13 @@ export class BankingController {
     return await this.bankingService.getAccountDetails(
       transferAccountNumberDto,
     );
+  }
+
+  @Post('transfer-funds')
+  async transferFunds(
+    @User() user: PayloadDto,
+    @Body() transferFundDto: TransferFundsDto,
+  ) {
+    return await this.bankingService.transferFunds(user, transferFundDto);
   }
 }

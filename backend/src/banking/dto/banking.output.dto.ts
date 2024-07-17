@@ -22,6 +22,16 @@ export const AccountsAreLinked: ResponseObject = {
   message: 'Accounts are linked',
 };
 
+export const InsufficientFunds: ResponseObject = {
+  status: HttpStatus.OK,
+  message: 'Insufficient funds',
+};
+
+export const NoLinkedAccounts: ResponseObject = {
+  status: HttpStatus.BAD_REQUEST,
+  message: 'No linked accounts',
+};
+
 export const AccountsBalancesAreRetrieved: ResponseObject = {
   status: HttpStatus.OK,
   message: 'Accounts balances are retrieved',

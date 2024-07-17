@@ -7,13 +7,14 @@ import {
   BvnDto,
   TransactionDto,
   TransactionFilterParams,
+  TransactionType,
   TransferAccountDto,
 } from 'src/banking/dto';
 
 import { NGN } from '@dinero.js/currencies';
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
-import { AccountStatus, AccountType, TransactionType } from '@prisma/client';
+import { AccountStatus, AccountType } from '@prisma/client';
 
 const accountTypes: AccountType[] = ['Current', 'Fixed', 'Savings'];
 const bankNames = ['Access Bank', 'First Bank', 'Kuda Bank', 'OPay'];
@@ -51,24 +52,15 @@ export class ObpService {
     return accountsLinkedToBvn;
   }
 
-  async getAccountsBalances(
-    bvnDto: BvnDto,
-    accountNumbers: AccountNumberDto[],
-  ) {
-    const accountsBalances = [];
-    for (const { number } of accountNumbers) {
-      faker.seed(Number(bvnDto.bvn) + Number(number));
-      accountsBalances.push(
-        dinero({
-          amount: parseInt(
-            faker.finance.amount({ min: minAmount, max: maxAmount }),
-          ),
-          currency: NGN,
-        }),
-      );
-    }
-
-    return accountsBalances;
+  async getAccountBalance(bvnDto: BvnDto, accountNumberDto: AccountNumberDto) {
+    faker.seed(Number(bvnDto.bvn) + Number(accountNumberDto.number));
+    const accountBalance = dinero({
+      amount: parseInt(
+        faker.finance.amount({ min: minAmount, max: maxAmount }),
+      ),
+      currency: NGN,
+    });
+    return accountBalance;
   }
 
   async getPhoneLinkedToBvn(bvnDto: BvnDto) {
@@ -104,9 +96,9 @@ export class ObpService {
           ),
           currency: NGN,
         });
-        const transactionType: TransactionType =
+        const transactionType =
           transactionsFilterParams.transactionType ??
-          faker.helpers.arrayElement(['Credit', 'Debit']);
+          (faker.helpers.arrayElement(['Credit', 'Debit']) as TransactionType);
         const description = faker.finance.transactionDescription();
         const accountNumber = faker.helpers.arrayElement(
           transactionsFilterParams.accountNumbers,
@@ -140,7 +132,7 @@ export class ObpService {
     const accountDetails: TransferAccountDto = {
       accountName,
       bankCode,
-      accountNumber: accountNumberDto,
+      accountNumber: accountNumberDto.number,
     };
 
     return accountDetails;

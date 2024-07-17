@@ -1,3 +1,4 @@
+import { greaterThanOrEqual, subtract, toDecimal } from 'dinero.js';
 import { DatabaseService } from 'src/database/database.service';
 import { MessageDto, OtpDto, OtpNotValid, Template } from 'src/messaging/dto';
 import { MessagingService } from 'src/messaging/messaging.service';
@@ -17,10 +18,13 @@ import {
   BvnDto,
   BvnIsVerified,
   BvnNotVerified,
+  InsufficientFunds,
   LinkedAccountsAreRetrieved,
+  NoLinkedAccounts,
   PhoneDto,
   TransactionFilterParams,
   TransactionsAreRetrieved,
+  TransferFundsDto,
 } from './dto';
 
 @Injectable()
@@ -127,18 +131,24 @@ export class BankingService {
 
   async getAccountsBalances(
     user: PayloadDto,
-    accountNumbers: AccountNumberDto[],
+    accountNumberDtos: AccountNumberDto[],
   ) {
     const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
+    if (!foundUser.isBvnVerified) {
+      return ResponseDto.generateResponse(BvnNotVerified);
+    }
 
     const bvnDto: BvnDto = { bvn: foundUser.bvn };
-    const accountsBalances = await this.obpService.getAccountsBalances(
-      bvnDto,
-      accountNumbers,
-    );
+    const accountsBalancesList = [];
+    for (const accountNumberDto of accountNumberDtos) {
+      accountsBalancesList.push(
+        this.obpService.getAccountBalance(bvnDto, accountNumberDto),
+      );
+    }
 
+    const accountsBalances = await Promise.all(accountsBalancesList);
     return ResponseDto.generateResponse(
       AccountsBalancesAreRetrieved,
       accountsBalances,
@@ -177,14 +187,27 @@ export class BankingService {
     const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
+    if (!foundUser.isBvnVerified) {
+      return ResponseDto.generateResponse(BvnNotVerified);
+    }
+
     const foundAccountNumbers = await this.databaseService.account.findMany({
       where: { userId: user.id },
       select: { number: true },
     });
 
+    if (!foundAccountNumbers) {
+      return ResponseDto.generateResponse(NoLinkedAccounts);
+    }
+
+    const accountNumbers: string[] = [];
+    for (const account of foundAccountNumbers) {
+      accountNumbers.push(account.number);
+    }
+
     transactionFilterParams.accountNumbers =
       transactionFilterParams.accountNumbers === undefined
-        ? foundAccountNumbers
+        ? accountNumbers
         : transactionFilterParams.accountNumbers;
 
     const bvnDto: BvnDto = { bvn: foundUser.bvn };
@@ -205,5 +228,46 @@ export class BankingService {
       AccountDetailsIsRetrieved,
       transferAccountDetails,
     );
+  }
+
+  async transferFunds(user: PayloadDto, transferFundsDto: TransferFundsDto) {
+    const bvnDto: BvnDto = await this.databaseService.user.findUnique({
+      where: { id: user.id },
+      select: { bvn: true },
+    });
+    const primaryAccountNumberDto: AccountNumberDto = {
+      number: transferFundsDto.primaryAccountNumber,
+    };
+    const primaryAccountBalance = await this.obpService.getAccountBalance(
+      bvnDto,
+      primaryAccountNumberDto,
+    );
+
+    const isTransferrable = greaterThanOrEqual(
+      primaryAccountBalance,
+      transferFundsDto.amount,
+    );
+
+    if (!isTransferrable) {
+      return ResponseDto.generateResponse(InsufficientFunds);
+    }
+
+    const balanceAfter = subtract(
+      primaryAccountBalance,
+      transferFundsDto.amount,
+    );
+
+    this.databaseService.debit.create({
+      data: {
+        description: transferFundsDto.description,
+        transferAccountName: transferFundsDto.transferAccountName,
+        transferAccountNumber: transferFundsDto.transferAccountNumber,
+        transferBankCode: transferFundsDto.transferBankCode,
+        amount: toDecimal(transferFundsDto.amount),
+        balanceAfter: toDecimal(balanceAfter),
+        userId: user.id,
+        accountNumber: transferFundsDto.primaryAccountNumber,
+      },
+    });
   }
 }

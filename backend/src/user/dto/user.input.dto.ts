@@ -3,20 +3,11 @@ import {
   IsNotEmpty,
   IsNumberString,
   IsString,
+  IsStrongPassword,
   Length,
-  Matches,
-  MinLength,
+  ValidateIf,
 } from 'class-validator';
 
-/** Password must:
- * contain at least one uppercase letter,
- * one lowercase letter,
- * one number,
- * one special character and,
- * must be at least 8 characters long.*/
-const passwordPattern = /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}$/;
-
-const minPasswordLength = 8;
 const tokenLength = 6;
 
 export class SignupDto {
@@ -34,9 +25,13 @@ export class SignupDto {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(minPasswordLength)
-  @Matches(passwordPattern)
+  @IsStrongPassword()
   password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ValidateIf((o) => o.password === o.confirmPassword)
+  confirmPassword: string;
 }
 
 export class LoginDto {
@@ -80,7 +75,11 @@ export class ResetPasswordDto {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(minPasswordLength)
-  @Matches(passwordPattern)
+  @IsStrongPassword()
   password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ValidateIf((o) => o.password === o.confirmPassword)
+  confirmPassword: string;
 }

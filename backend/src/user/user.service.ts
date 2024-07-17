@@ -124,6 +124,7 @@ export class UserService {
 
     const otpDto: OtpDto = { secret: foundUser.secret, token: tokenDto.token };
     const isValidatedOtp = await this.messagingService.validateOtp(otpDto);
+
     if (!isValidatedOtp) {
       return ResponseDto.generateResponse(OtpNotValid);
     }

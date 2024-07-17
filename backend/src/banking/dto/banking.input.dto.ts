@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsDate,
   IsDateString,
   IsEmail,
@@ -10,9 +11,10 @@ import {
   IsString,
   IsUUID,
   Length,
+  ValidateNested,
 } from 'class-validator';
 
-import { AccountStatus, AccountType, TransactionType } from '@prisma/client';
+import { AccountStatus, AccountType } from '@prisma/client';
 import { Dinero } from 'dinero.js';
 
 export class AccountDto {
@@ -67,6 +69,11 @@ export class PhoneDto {
   phone: string;
 }
 
+export enum TransactionType {
+  Credit = 'Credit',
+  Debit = 'Debit',
+}
+
 export class TransactionDto {
   @IsUUID()
   @IsNotEmpty()
@@ -87,8 +94,10 @@ export class TransactionDto {
   @IsNotEmpty()
   description: string;
 
+  @IsNumberString()
   @IsNotEmpty()
-  accountNumber: AccountNumberDto;
+  @Length(10)
+  accountNumber: string;
 
   @IsNotEmpty()
   balanceAfter: Dinero<number>;
@@ -103,22 +112,13 @@ export class TransferAccountDto {
   @IsNotEmpty()
   bankCode: string;
 
+  @IsNumberString()
   @IsNotEmpty()
-  accountNumber: AccountNumberDto;
+  @Length(10)
+  accountNumber: string;
 }
 
 export class TransferFundsDto {
-  @IsString()
-  @IsNotEmpty()
-  transferAccountName: string;
-
-  @IsNotEmpty()
-  transferAccountNumber: AccountNumberDto;
-
-  @IsIBAN()
-  @IsNotEmpty()
-  transferBankCode: string;
-
   @IsNotEmpty()
   amount: Dinero<number>;
 
@@ -126,14 +126,36 @@ export class TransferFundsDto {
   @IsNotEmpty()
   description: string;
 
+  @IsString()
   @IsNotEmpty()
-  primaryAccount: AccountNumberDto;
+  transferAccountName: string;
 
-  secondaryAccounts?: AccountNumberDto;
+  @IsIBAN()
+  @IsNotEmpty()
+  transferBankCode: string;
+
+  @IsNumberString()
+  @IsNotEmpty()
+  @Length(10)
+  transferAccountNumber: string;
+
+  @IsNumberString()
+  @IsNotEmpty()
+  @Length(10)
+  primaryAccountNumber: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Length(10)
+  secondaryAccountNumbers?: string[];
 }
 
 export class TransactionFilterParams {
-  accountNumbers?: AccountNumberDto[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @IsNumberString()
+  @Length(10)
+  accountNumbers?: string[];
 
   @IsDateString()
   startDate?: string;
