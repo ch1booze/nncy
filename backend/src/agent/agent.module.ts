@@ -9,7 +9,6 @@ import { AgentService } from './agent.service';
 
 @Module({
   controllers: [AgentController],
-
   providers: [
     AgentFactoryService,
     AgentPromptsService,

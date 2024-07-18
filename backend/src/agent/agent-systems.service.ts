@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { AgentPromptsService } from './agent-prompts.service';
 import { AgentToolsService } from './agent-tools.service';
 import { AgentSystem } from './dto/agent.dto';
 
@@ -10,7 +11,10 @@ export class AgentSystemsService {
 
   private agentSystems: AgentSystem[];
 
-  constructor(private agentToolService: AgentToolsService) {
+  constructor(
+    private agentToolService: AgentToolsService,
+    private agentPromptsService: AgentPromptsService,
+  ) {
     this.sendMoneyTool = this.agentToolService.sendMoneyTool();
     this.getTransactionsTool = this.agentToolService.getTransactionsTool();
 
