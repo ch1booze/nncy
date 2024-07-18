@@ -1,5 +1,5 @@
 import { MessagingModule } from 'src/messaging/messaging.module';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { DatabaseModule } from 'src/database/database.module';
 
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -13,7 +13,7 @@ import { UserService } from './user.service';
 @Module({
   imports: [
     ConfigModule,
-    PrismaModule,
+    DatabaseModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
