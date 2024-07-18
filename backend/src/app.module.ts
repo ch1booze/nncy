@@ -6,25 +6,25 @@ import { AgentModule } from './agent/agent.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BankingModule } from './banking/banking.module';
-import { DatabaseModule } from './database/database.module';
 import { HttpExceptionFilter } from './http-exception.filter';
 import { MessagingModule } from './messaging/messaging.module';
 import { ObpModule } from './obp/obp.module';
+import { PrismaModule } from './prisma/prisma.module';
 import { ResponseInterceptor } from './response/response.interceptor';
 import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    UserModule,
+    AgentModule,
     BankingModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
-    DatabaseModule,
+    PrismaModule,
     MessagingModule,
     ObpModule,
-    AgentModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [

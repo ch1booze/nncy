@@ -1,2 +1,2 @@
-export * from './banking.input.dto';
-export * from './banking.output.dto';
+export * from './banking.dto';
+export * from './banking.response';

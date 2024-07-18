@@ -1,2 +1,2 @@
-export * from './messaging.input.dto';
-export * from './messaging.output.dto';
+export * from './messaging.dto';
+export * from './messaging.response';

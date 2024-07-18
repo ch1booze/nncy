@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class DatabaseService extends PrismaClient {
+export class PrismaService extends PrismaClient {
   async getSelectFields(selectList: string[]) {
     const selectFields: { [key: string]: boolean } = {};
     selectList.forEach((field) => {

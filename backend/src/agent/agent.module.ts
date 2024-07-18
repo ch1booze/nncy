@@ -1,9 +1,18 @@
 import { Module } from '@nestjs/common';
+
+import { AgentFactoryService } from './agent-factory.service';
+import { AgentPromptsService } from './agent-prompts.service';
+import { AgentSystemsService } from './agent-systems.service';
+import { AgentToolsService } from './agent-tools.service';
 import { AgentService } from './agent.service';
-import { AgentController } from './agent.controller';
 
 @Module({
-  controllers: [AgentController],
-  providers: [AgentService],
+  providers: [
+    AgentFactoryService,
+    AgentPromptsService,
+    AgentToolsService,
+    AgentSystemsService,
+    AgentService,
+  ],
 })
 export class AgentModule {}
