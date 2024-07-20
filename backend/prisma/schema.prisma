@@ -91,14 +91,11 @@ model Budget {
 
   category    String
   totalAmount Decimal @db.Money
-  spentAmount Decimal @db.Money
+  spentAmount Decimal @default(0) @db.Money
 
   status              BudgetStatus @default(Active)
-  refreshCycle        String
-  currentCycleEndDate DateTime     @db.Date
-
-  startDate DateTime @db.Date
-  endDate   DateTime @db.Date
+  refreshCycle        String?
+  currentCycleEndDate DateTime?    @db.Date
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @db.Uuid
