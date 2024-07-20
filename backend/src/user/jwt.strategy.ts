@@ -12,7 +12,7 @@ import {
   TokenNotFound,
   UserIsAuthorized,
   UserNotAuthorized,
-} from './dto';
+} from './payload';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

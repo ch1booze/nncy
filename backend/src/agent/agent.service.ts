@@ -5,8 +5,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { systemPrompt } from './agent.prompts';
-import { ChatDto } from './dto/agent.dto';
-import { IntentIsGotten } from './dto/agent.responses';
+import { ChatDto } from './payload/agent.dto';
+import { IntentIsGotten } from './payload/agent.responses';
 
 @Injectable()
 export class AgentService {

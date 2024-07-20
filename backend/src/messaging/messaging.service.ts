@@ -5,7 +5,8 @@ import { ResponseDto } from 'src/response/response.dto';
 import { Injectable, NotImplementedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { EmailIsSent, MessageDto, OtpDto, SmsIsSent, Template } from './dto';
+import { MessageDto, OtpDto, Template } from './payload/messaging.dto';
+import { EmailIsSent, SmsIsSent } from './payload/messaging.response';
 
 @Injectable()
 export class MessagingService {

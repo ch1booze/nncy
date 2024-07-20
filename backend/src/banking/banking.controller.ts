@@ -1,5 +1,5 @@
-import { PayloadDto, TokenDto } from 'src/user/dto';
 import { JwtAuthGuard } from 'src/user/jwt-auth.guard';
+import { PayloadDto, TokenDto } from 'src/user/payload';
 import { User } from 'src/user/user.decorator';
 
 import {
@@ -19,7 +19,7 @@ import {
   BvnDto,
   TransactionFilterDto,
   TransferFundsDto,
-} from './dto';
+} from './payload/banking.dto';
 
 @Controller('banking')
 @UseGuards(JwtAuthGuard)

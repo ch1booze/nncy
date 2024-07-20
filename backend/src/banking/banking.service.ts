@@ -1,31 +1,38 @@
 import { greaterThanOrEqual, subtract, toDecimal } from 'dinero.js';
-import { MessageDto, OtpDto, OtpNotValid, Template } from 'src/messaging/dto';
-import { MessagingService } from 'src/messaging/messaging.service';
-import { ObpService } from 'src/obp/obp.service';
 import { DatabaseService } from 'src/database/database.service';
+import { MessagingService } from 'src/messaging/messaging.service';
+import {
+  MessageDto,
+  OtpDto,
+  Template,
+} from 'src/messaging/payload/messaging.dto';
+import { OtpNotValid } from 'src/messaging/payload/messaging.response';
+import { ObpService } from 'src/obp/obp.service';
 import { ResponseDto } from 'src/response/response.dto';
-import { EmailNotVerified, PayloadDto, TokenDto } from 'src/user/dto';
+import { EmailNotVerified, PayloadDto, TokenDto } from 'src/user/payload';
 
 import { Injectable } from '@nestjs/common';
 
 import {
+  AccountNumberDto,
+  BvnDto,
+  PhoneDto,
+  TransactionFilterDto,
+  TransferFundsDto,
+} from './payload/banking.dto';
+import {
   AccountDetailsIsRetrieved,
   AccountIsRetrieved,
-  AccountNumberDto,
   AccountsAreLinked,
   AccountsBalancesAreRetrieved,
   AccountsSummaryAreRetrieved,
-  BvnDto,
   BvnIsVerified,
   BvnNotVerified,
   InsufficientFunds,
   LinkedAccountsAreRetrieved,
   NoLinkedAccounts,
-  PhoneDto,
-  TransactionFilterDto,
   TransactionsAreRetrieved,
-  TransferFundsDto,
-} from './dto';
+} from './payload/banking.response';
 
 @Injectable()
 export class BankingService {
@@ -157,9 +164,8 @@ export class BankingService {
 
   async getAccountsSummary(user: PayloadDto) {
     const AccountSummarySelectList = ['bankName', 'number', 'currencyCode'];
-    const AccountSummarySelectFields = await this.databaseService.getSelectFields(
-      AccountSummarySelectList,
-    );
+    const AccountSummarySelectFields =
+      await this.databaseService.getSelectFields(AccountSummarySelectList);
     const foundAccounts = await this.databaseService.account.findMany({
       where: { userId: user.id },
       select: AccountSummarySelectFields,

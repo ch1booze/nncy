@@ -3,7 +3,7 @@ import { JwtAuthGuard } from 'src/user/jwt-auth.guard';
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 
 import { AgentService } from './agent.service';
-import { ChatDto } from './dto/agent.dto';
+import { ChatDto } from './payload/agent.dto';
 
 @Controller('agent')
 @UseGuards(JwtAuthGuard)

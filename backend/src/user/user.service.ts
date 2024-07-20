@@ -1,7 +1,12 @@
 import * as argon2 from 'argon2';
-import { MessageDto, OtpDto, OtpNotValid, Template } from 'src/messaging/dto';
-import { MessagingService } from 'src/messaging/messaging.service';
 import { DatabaseService } from 'src/database/database.service';
+import { MessagingService } from 'src/messaging/messaging.service';
+import {
+  MessageDto,
+  OtpDto,
+  Template,
+} from 'src/messaging/payload/messaging.dto';
+import { OtpNotValid } from 'src/messaging/payload/messaging.response';
 import { ResponseDto } from 'src/response/response.dto';
 
 import { Injectable } from '@nestjs/common';
@@ -21,7 +26,7 @@ import {
   UserIsAuthorized,
   UserNotFound,
   UserProfileIsRetrieved,
-} from './dto';
+} from './payload';
 
 @Injectable()
 export class UserService {

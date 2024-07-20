@@ -9,7 +9,7 @@ import {
   TransactionFilterDto,
   TransactionType,
   TransferAccountDto,
-} from 'src/banking/dto';
+} from 'src/banking/payload/banking.dto';
 
 import { NGN } from '@dinero.js/currencies';
 import { faker } from '@faker-js/faker';

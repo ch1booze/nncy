@@ -10,7 +10,7 @@ import type {
   ResetPasswordDto,
   SignupDto,
   TokenDto,
-} from './dto';
+} from './payload';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('user')
