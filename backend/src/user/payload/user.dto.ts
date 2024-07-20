@@ -38,7 +38,7 @@ export class LoginDto {
   password: string;
 }
 
-export class PayloadDto {
+export class UserDto {
   @IsString()
   @IsNotEmpty()
   id: string;

@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
 
 import {
-  PayloadDto,
+  UserDto,
   TokenNotFound,
   UserIsAuthorized,
   UserNotAuthorized,
@@ -39,7 +39,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       return ResponseDto.generateResponse(UserNotAuthorized);
     }
 
-    const user: PayloadDto = verifiedPayload;
+    const user: UserDto = verifiedPayload;
     return ResponseDto.generateResponse(UserIsAuthorized, user);
   }
 }

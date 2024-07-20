@@ -9,7 +9,8 @@ import {
 import { OtpNotValid } from 'src/messaging/payload/messaging.response';
 import { ObpService } from 'src/obp/obp.service';
 import { ResponseDto } from 'src/response/response.dto';
-import { EmailNotVerified, PayloadDto, TokenDto } from 'src/user/payload';
+import { TokenDto, UserDto } from 'src/user/payload/user.dto';
+import { EmailNotVerified } from 'src/user/payload/user.response';
 
 import { Injectable } from '@nestjs/common';
 
@@ -42,7 +43,7 @@ export class BankingService {
     private obpService: ObpService,
   ) {}
 
-  async sendBvnVerification(user: PayloadDto, bvnDto: BvnDto) {
+  async sendBvnVerification(user: UserDto, bvnDto: BvnDto) {
     const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
@@ -68,7 +69,7 @@ export class BankingService {
     return await this.messagingService.sendSms(sendSmsDto);
   }
 
-  async verifyBvn(user: PayloadDto, tokenDto: TokenDto) {
+  async verifyBvn(user: UserDto, tokenDto: TokenDto) {
     const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
@@ -90,7 +91,7 @@ export class BankingService {
     return ResponseDto.generateResponse(BvnIsVerified);
   }
 
-  async getAccountsLinkedToBvn(user: PayloadDto) {
+  async getAccountsLinkedToBvn(user: UserDto) {
     const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
@@ -108,7 +109,7 @@ export class BankingService {
     );
   }
 
-  async linkAccounts(user: PayloadDto, accountNumbers: AccountNumberDto[]) {
+  async linkAccounts(user: UserDto, accountNumbers: AccountNumberDto[]) {
     const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
@@ -137,7 +138,7 @@ export class BankingService {
   }
 
   async getAccountsBalances(
-    user: PayloadDto,
+    user: UserDto,
     accountNumberDtos: AccountNumberDto[],
   ) {
     const foundUser = await this.databaseService.user.findUnique({
@@ -162,7 +163,7 @@ export class BankingService {
     );
   }
 
-  async getAccountsSummary(user: PayloadDto) {
+  async getAccountsSummary(user: UserDto) {
     const AccountSummarySelectList = ['bankName', 'number', 'currencyCode'];
     const AccountSummarySelectFields =
       await this.databaseService.getSelectFields(AccountSummarySelectList);
@@ -177,7 +178,7 @@ export class BankingService {
     );
   }
 
-  async getAccountById(user: PayloadDto, index: number) {
+  async getAccountById(user: UserDto, index: number) {
     const foundAccount = await this.databaseService.account.findFirst({
       where: { userId: user.id },
       skip: index,
@@ -188,7 +189,7 @@ export class BankingService {
   }
 
   async getTransactions(
-    user: PayloadDto,
+    user: UserDto,
     TransactionFilterDto: TransactionFilterDto,
   ) {
     const foundUser = await this.databaseService.user.findUnique({
@@ -237,7 +238,7 @@ export class BankingService {
     );
   }
 
-  async transferFunds(user: PayloadDto, transferFundsDto: TransferFundsDto) {
+  async transferFunds(user: UserDto, transferFundsDto: TransferFundsDto) {
     const bvnDto: BvnDto = await this.databaseService.user.findUnique({
       where: { id: user.id },
       select: { bvn: true },

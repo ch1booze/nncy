@@ -14,19 +14,21 @@ import { JwtService } from '@nestjs/jwt';
 
 import {
   EmailDto,
-  EmailIsVerified,
-  IncorrectPassword,
   LoginDto,
-  PasswordIsReset,
-  PayloadDto,
   ResetPasswordDto,
   SignupDto,
   TokenDto,
+  UserDto,
+} from './payload/user.dto';
+import {
+  EmailIsVerified,
+  IncorrectPassword,
+  PasswordIsReset,
   UserAlreadyExists,
   UserIsAuthorized,
   UserNotFound,
   UserProfileIsRetrieved,
-} from './payload';
+} from './payload/user.response';
 
 @Injectable()
 export class UserService {
@@ -36,8 +38,8 @@ export class UserService {
     private messagingService: MessagingService,
   ) {}
 
-  private async authorizeUser(payloadDto: PayloadDto) {
-    const accessToken = await this.jwtService.signAsync(payloadDto);
+  private async authorizeUser(userDto: UserDto) {
+    const accessToken = await this.jwtService.signAsync(userDto);
     return ResponseDto.generateResponse(UserIsAuthorized, accessToken);
   }
 
@@ -57,8 +59,8 @@ export class UserService {
       },
     });
 
-    const payloadDto: PayloadDto = createdUser;
-    return await this.authorizeUser(payloadDto);
+    const userDto: UserDto = createdUser;
+    return await this.authorizeUser(userDto);
   }
 
   async login(loginDto: LoginDto) {
@@ -77,11 +79,11 @@ export class UserService {
       return ResponseDto.generateResponse(IncorrectPassword);
     }
 
-    const payloadDto: PayloadDto = foundUser;
-    return await this.authorizeUser(payloadDto);
+    const userDto: UserDto = foundUser;
+    return await this.authorizeUser(userDto);
   }
 
-  async getProfile(user: PayloadDto) {
+  async getProfile(user: UserDto) {
     const ProfileSelectList = [
       'email',
       'firstName',
@@ -100,7 +102,7 @@ export class UserService {
     return ResponseDto.generateResponse(UserProfileIsRetrieved, foundProfile);
   }
 
-  async sendVerificationEmail(user: PayloadDto) {
+  async sendVerificationEmail(user: UserDto) {
     const otpDto: OtpDto = await this.messagingService.generateOtp();
     const updatedUser = await this.databaseService.user.update({
       where: { id: user.id },
@@ -117,7 +119,7 @@ export class UserService {
     return await this.messagingService.sendEmail(sendEmailDto);
   }
 
-  async verifyEmail(user: PayloadDto, tokenDto: TokenDto) {
+  async verifyEmail(user: UserDto, tokenDto: TokenDto) {
     const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });
@@ -137,7 +139,7 @@ export class UserService {
     return ResponseDto.generateResponse(EmailIsVerified);
   }
 
-  async sendResetPasswordEmail(user: PayloadDto, emailDto: EmailDto) {
+  async sendResetPasswordEmail(user: UserDto, emailDto: EmailDto) {
     const foundUser = await this.databaseService.user.findUnique({
       where: { email: emailDto.email },
     });
@@ -161,10 +163,7 @@ export class UserService {
     return await this.messagingService.sendEmail(sendEmailDto);
   }
 
-  async verifyResetPassword(
-    user: PayloadDto,
-    resetPasswordDto: ResetPasswordDto,
-  ) {
+  async verifyResetPassword(user: UserDto, resetPasswordDto: ResetPasswordDto) {
     const foundUser = await this.databaseService.user.findUnique({
       where: { id: user.id },
     });

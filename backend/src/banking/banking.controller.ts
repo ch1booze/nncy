@@ -1,5 +1,5 @@
 import { JwtAuthGuard } from 'src/user/jwt-auth.guard';
-import { PayloadDto, TokenDto } from 'src/user/payload';
+import { TokenDto, UserDto } from 'src/user/payload/user.dto';
 import { User } from 'src/user/user.decorator';
 
 import {
@@ -27,36 +27,36 @@ export class BankingController {
   constructor(private readonly bankingService: BankingService) {}
 
   @Post('send-bvn-verification')
-  async sendBvnVerification(@User() user: PayloadDto, @Body() bvnDto: BvnDto) {
+  async sendBvnVerification(@User() user: UserDto, @Body() bvnDto: BvnDto) {
     return await this.bankingService.sendBvnVerification(user, bvnDto);
   }
 
   @Post('verify-bvn')
-  async verifyBvn(@User() user: PayloadDto, @Body() tokenDto: TokenDto) {
+  async verifyBvn(@User() user: UserDto, @Body() tokenDto: TokenDto) {
     return await this.bankingService.verifyBvn(user, tokenDto);
   }
 
   @Get('get-accounts-linked-to-bvn')
-  async getAccountsLinkedToBvn(@User() user: PayloadDto) {
+  async getAccountsLinkedToBvn(@User() user: UserDto) {
     return await this.bankingService.getAccountsLinkedToBvn(user);
   }
 
   @Put('link-accounts')
   async linkAccounts(
-    @User() user: PayloadDto,
+    @User() user: UserDto,
     @Body() accountNumbers: AccountNumberDto[],
   ) {
     return await this.bankingService.linkAccounts(user, accountNumbers);
   }
 
   @Get('get-accounts-summary')
-  async getAccountsSummary(@User() user: PayloadDto) {
+  async getAccountsSummary(@User() user: UserDto) {
     return await this.bankingService.getAccountsSummary(user);
   }
 
   @Get('get-account')
   async getAccountByIndex(
-    @User() user: PayloadDto,
+    @User() user: UserDto,
     @Query('index', ParseIntPipe) index: number,
   ) {
     return await this.bankingService.getAccountById(user, index);
@@ -64,7 +64,7 @@ export class BankingController {
 
   @Post('get-accounts-balances')
   async getAccountsBalances(
-    @User() user: PayloadDto,
+    @User() user: UserDto,
     @Body() accountNumbers: AccountNumberDto[],
   ) {
     return await this.bankingService.getAccountsBalances(user, accountNumbers);
@@ -72,7 +72,7 @@ export class BankingController {
 
   @Get('get-transactions')
   async getTransactions(
-    @User() user: PayloadDto,
+    @User() user: UserDto,
     @Body() transactionFilterDto: TransactionFilterDto,
   ) {
     return await this.bankingService.getTransactions(
@@ -92,7 +92,7 @@ export class BankingController {
 
   @Post('transfer-funds')
   async transferFunds(
-    @User() user: PayloadDto,
+    @User() user: UserDto,
     @Body() transferFundDto: TransferFundsDto,
   ) {
     return await this.bankingService.transferFunds(user, transferFundDto);

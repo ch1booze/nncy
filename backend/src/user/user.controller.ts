@@ -6,7 +6,7 @@ import { UserService } from './user.service';
 import type {
   EmailDto,
   LoginDto,
-  PayloadDto,
+  UserDto,
   ResetPasswordDto,
   SignupDto,
   TokenDto,
@@ -29,25 +29,25 @@ export class UserController {
 
   @Get('get-profile')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@User() user: PayloadDto) {
+  async getProfile(@User() user: UserDto) {
     return await this.userService.getProfile(user);
   }
 
   @Get('send-verification-email')
   @UseGuards(JwtAuthGuard)
-  async sendVerificationEmail(@User() user: PayloadDto) {
+  async sendVerificationEmail(@User() user: UserDto) {
     return await this.userService.sendVerificationEmail(user);
   }
 
   @Post('verify-email')
   @UseGuards(JwtAuthGuard)
-  async verifyEmail(@User() user: PayloadDto, @Body() tokenDto: TokenDto) {
+  async verifyEmail(@User() user: UserDto, @Body() tokenDto: TokenDto) {
     return await this.userService.verifyEmail(user, tokenDto);
   }
 
   @Get('send-reset-password-email')
   async sendResetPasswordEmail(
-    @User() user: PayloadDto,
+    @User() user: UserDto,
     @Body() emailDto: EmailDto,
   ) {
     return await this.userService.sendResetPasswordEmail(user, emailDto);
@@ -55,7 +55,7 @@ export class UserController {
 
   @Patch('verify-reset-password')
   async verifyResetPassword(
-    @User() user: PayloadDto,
+    @User() user: UserDto,
     @Body() resetPasswordDto: ResetPasswordDto,
   ) {
     return await this.userService.verifyResetPassword(user, resetPasswordDto);
