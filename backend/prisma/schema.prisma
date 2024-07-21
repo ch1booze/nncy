@@ -93,6 +93,9 @@ model Budget {
   totalAmount Decimal @db.Money
   spentAmount Decimal @default(0) @db.Money
 
+  startDate DateTime  @db.Date
+  endDate   DateTime? @db.Date
+
   status              BudgetStatus @default(Active)
   refreshCycle        String?
   currentCycleEndDate DateTime?    @db.Date
@@ -104,6 +107,5 @@ model Budget {
 enum BudgetStatus {
   Active
   Paused
-  Cancelled
   Completed
 }

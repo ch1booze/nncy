@@ -8,7 +8,6 @@ import { CreateBudgetDto } from './payload/budget.dto';
 @Injectable()
 export class CreateBudgetPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
-    console.log(value);
     const totalAmount = dinero({
       amount: parseInt(value.totalAmount),
       currency: NGN,
@@ -17,6 +16,7 @@ export class CreateBudgetPipe implements PipeTransform {
     const createBudgetDto: CreateBudgetDto = {
       category: value.category,
       totalAmount,
+      startDate: value.startDate,
       refreshCycle: value.refreshCycle,
     };
 
