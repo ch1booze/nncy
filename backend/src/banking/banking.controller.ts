@@ -20,6 +20,7 @@ import {
   TransactionFilterDto,
   TransferFundsDto,
 } from './payload/banking.dto';
+import { TransferFundsPipe } from './transfer-funds.pipe';
 
 @Controller('banking')
 @UseGuards(JwtAuthGuard)
@@ -93,7 +94,7 @@ export class BankingController {
   @Post('transfer-funds')
   async transferFunds(
     @User() user: UserDto,
-    @Body() transferFundDto: TransferFundsDto,
+    @Body(TransferFundsPipe) transferFundDto: TransferFundsDto,
   ) {
     return await this.bankingService.transferFunds(user, transferFundDto);
   }

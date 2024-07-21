@@ -9,9 +9,6 @@ export class CreateBudgetDto {
   @IsNotEmpty()
   totalAmount: Dinero<number>;
 
-  @IsNotEmpty()
-  spentAmount: Dinero<number>;
-
   @IsString()
   @IsNotEmpty()
   refreshCycle: string;

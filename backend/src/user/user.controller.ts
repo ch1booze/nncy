@@ -2,16 +2,16 @@ import { User } from 'src/user/user.decorator';
 
 import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 
-import { UserService } from './user.service';
-import type {
+import { JwtAuthGuard } from './jwt-auth.guard';
+import {
   EmailDto,
   LoginDto,
-  UserDto,
   ResetPasswordDto,
   SignupDto,
   TokenDto,
-} from './payload';
-import { JwtAuthGuard } from './jwt-auth.guard';
+  UserDto,
+} from './payload/user.dto';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {

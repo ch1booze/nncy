@@ -33,6 +33,7 @@ import {
   LinkedAccountsAreRetrieved,
   NoLinkedAccounts,
   TransactionsAreRetrieved,
+  TransferFundsIsSuccessful,
 } from './payload/banking.response';
 
 @Injectable()
@@ -277,5 +278,7 @@ export class BankingService {
         accountNumber: transferFundsDto.primaryAccountNumber,
       },
     });
+
+    return ResponseDto.generateResponse(TransferFundsIsSuccessful);
   }
 }

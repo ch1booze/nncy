@@ -56,3 +56,8 @@ export const AccountDetailsIsRetrieved: ResponseObject = {
   status: HttpStatus.OK,
   message: 'Account details is retrieved',
 };
+
+export const TransferFundsIsSuccessful: ResponseObject = {
+  status: HttpStatus.OK,
+  message: 'Transfer funds is successful',
+};
