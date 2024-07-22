@@ -38,7 +38,7 @@ export class BudgetService {
     const budgetJob = new CronJob(cronPattern, async () => {
       await this.updateBudget(budgetId, refreshCycle);
     });
-    this.schedulerRegistry.addCronJob(budgetId, budgetJob);
+    await this.schedulerRegistry.addCronJob(budgetId, budgetJob);
   }
 
   private async computeCronPattern(refreshCycle: string) {

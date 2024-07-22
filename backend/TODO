@@ -1,18 +1,1 @@
-Done:
-    ✔ Add verification flag to user model. @done(24-06-29 13:39)
-    ✔ Add user decorator. @done(24-07-02 19:57)
-    ✔ Implement standardisation of responses. @done(24-07-02 14:34)
-    ✔ Create account resource. @done(24-07-03 11:16)
-    ✔ Implement a response interceptor. @done(24-07-03 19:28)
-    ✔ Add validation and confirm password matching to password. @done(24-07-04 10:28)
-    ✔ Implement account resource. @done(24-07-10 15:24)
-    ✔ Abstract Otp generation so it is applicable easily to the resetting of password. @done(24-07-10 15:24)
-
-ToDo:
-    ☐ Implement getting of transactions pertaining to a user.
-    ☐ Implement getting of transactions pertaining to a user's account.
-
-Later:
-    ☐ Implement testing framework.
-    ☐ Implement a logger service to log exceptions.
-    ☐ Look into how banks ensure security of sensitive information.
+☐ Implement agent using graph system.
