@@ -5,3 +5,8 @@ export class ChatDto {
   @IsNotEmpty()
   chat: string;
 }
+
+export class AgentNode {
+  prompt: string;
+  tools: any[];
+}

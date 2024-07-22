@@ -1,34 +1,36 @@
-import Groq from 'groq-sdk';
-import { ResponseDto } from 'src/response/response.dto';
+import cytoscape, { Core } from 'cytoscape';
+import { Groq, LLMAgent } from 'llamaindex';
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { systemPrompt } from './agent.prompts';
-import { ChatDto } from './payload/agent.dto';
-import { IntentIsGotten } from './payload/agent.responses';
+import { AgentNodeService } from './agent-node.service';
+import { AgentNode, ChatDto } from './payload/agent.dto';
 
 @Injectable()
 export class AgentService {
   private llm: Groq;
+  private agentNodes;
+  private graph: Core;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private agentNodeService: AgentNodeService,
+  ) {
     const apiKey = this.configService.get<string>('GROQ_API_KEY');
-    this.llm = new Groq({ apiKey });
+    const model = 'llama3-8b-8192';
+    this.llm = new Groq({ apiKey, model });
+    this.agentNodes = this.agentNodeService.getAgentNodes();
+    this.graph = cytoscape({ elements: [{ data: { id: 'i' } }] });
   }
 
-  async getIntent(chatDto: ChatDto) {
-    const chatCompletion = await this.llm.chat.completions.create({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: chatDto.chat },
-      ],
-      model: 'llama3-8b-8192',
+  private async createAgent(llm, agentNode: AgentNode) {
+    return new LLMAgent({
+      llm,
+      tools: agentNode.tools,
+      systemPrompt: agentNode.prompt,
     });
-
-    return ResponseDto.generateResponse(
-      IntentIsGotten,
-      chatCompletion.choices[0].message.content,
-    );
   }
+
+  async chat(chatDto: ChatDto) {}
 }

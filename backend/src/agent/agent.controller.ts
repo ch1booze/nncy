@@ -10,8 +10,8 @@ import { ChatDto } from './payload/agent.dto';
 export class AgentController {
   constructor(private readonly agentService: AgentService) {}
 
-  @Post('get-intent')
-  async getIntent(@Body() chatDto: ChatDto) {
-    return await this.agentService.getIntent(chatDto);
+  @Post('chat')
+  async chat(@Body() chatDto: ChatDto) {
+    return await this.agentService.chat(chatDto);
   }
 }
