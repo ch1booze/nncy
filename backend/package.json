@@ -47,6 +47,7 @@
     "rxjs": "^7.8.1",
     "smtpexpress": "^0.0.14",
     "speakeasy": "^2.0.0",
+    "supertokens-node": "^19.0.1",
     "twilio": "^5.2.2"
   },
   "devDependencies": {

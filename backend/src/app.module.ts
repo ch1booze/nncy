@@ -6,6 +6,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AgentModule } from './agent/agent.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { BankingModule } from './banking/banking.module';
 import { BudgetModule } from './budget/budget.module';
 import { DatabaseModule } from './database/database.module';
@@ -17,6 +18,16 @@ import { HttpExceptionFilter } from './utils/http-exception.filter';
 
 @Module({
   imports: [
+    AuthModule.forRoot({
+      connectionURI: 'https://try.supertokens.com',
+      appInfo: {
+        appName: 'nancy',
+        apiDomain: 'http://localhost:3000',
+        websiteDomain: 'http://localhost:3000',
+        apiBasePath: '/auth',
+        websiteBasePath: '/auth',
+      },
+    }),
     AgentModule,
     BudgetModule,
     BankingModule,
