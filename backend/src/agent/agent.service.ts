@@ -1,4 +1,4 @@
-import { Groq, LLMAgent, Settings } from 'llamaindex';
+import { Groq, LLMAgent } from 'llamaindex';
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,15 +13,11 @@ export class AgentService {
   private llm: Groq;
   private graph: { [key: string]: string[] } = {};
   private agents: { [key: string]: LLMAgent } = {};
-  private logs: any[] = [];
 
   constructor(
     private readonly configService: ConfigService,
     private agentNodeService: AgentNodeService,
   ) {
-    Settings.callbackManager('llm-tool-result', (event) => {
-      this.logs.push(event.detail.payload);
-    });
     const apiKey = this.configService.get<string>('GROQ_API_KEY');
     const model = 'llama3-8b-8192';
     this.llm = new Groq({ apiKey, model });
@@ -57,7 +53,7 @@ export class AgentService {
   }
 
   async chat(chatDto: ChatDto) {
-    const result = await this.agents.systemAgent.chat({
+    const result = await this.agents['systemAgent'].chat({
       message: chatDto.message,
     });
 

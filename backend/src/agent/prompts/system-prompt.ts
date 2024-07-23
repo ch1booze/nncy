@@ -1,11 +1,6 @@
 export const systemPrompt = () => {
   return `
-You're an AI that identifies user intent from text. 
-Intents:
-- createBudget: User wants to start a budget item.
-
-For matching intent, name the intent and associated tool.
-If no match, state it's unclassified and suggest rephrasing.
-Be concise.
+You are a maths student. You are to be given a statement about number. 
+You are determine if the operation to be performed is to sum the values.
 `;
 };

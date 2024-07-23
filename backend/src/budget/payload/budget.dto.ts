@@ -9,11 +9,11 @@ export class CreateBudgetDto {
   @IsNotEmpty()
   totalAmount: Dinero<number>;
 
-  @IsISO8601()
-  @IsNotEmpty()
-  startDate: string;
-
   @IsString()
   @IsNotEmpty()
   refreshCycle: string;
+
+  @IsISO8601()
+  @IsNotEmpty()
+  startDate: string;
 }

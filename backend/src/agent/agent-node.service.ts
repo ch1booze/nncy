@@ -15,7 +15,7 @@ export class AgentNodeService {
     const systemAgent = {
       name: 'systemAgent',
       prompt: systemPrompt(),
-      tools: [this.tools.createBudget],
+      tools: [this.tools.sumNumbers],
     };
 
     this.agentNodes = [systemAgent];
