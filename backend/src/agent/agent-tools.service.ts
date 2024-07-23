@@ -1,32 +1,55 @@
-import { Injectable } from '@nestjs/common';
 import { FunctionTool } from 'llamaindex';
+
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AgentToolsService {
-  private sumNumbersFn = ({ a, b }) => {
-    return `${a + b}`;
+  private createBudgetFn = ({
+    category,
+    totalAmount,
+    refreshCycle,
+    startDate,
+  }) => {
+    return `
+    Category: ${category}
+    Total Amount:  ${totalAmount}
+    Refresh Cycle: ${refreshCycle}
+    Start Date: ${startDate}
+    `;
   };
 
-  private sumNumbersTool = FunctionTool.from(this.sumNumbersFn, {
-    name: 'sumNumbers',
-    description: 'Use this function to sum two numbers',
+  private createBudgetTool = FunctionTool.from(this.createBudgetFn, {
+    name: 'createBudget',
+    description: `
+    Use this function to extract the parameters for creating a budget.
+    If any required information is missing, ask the user for clarification.
+    `,
     parameters: {
       type: 'object',
       properties: {
-        a: {
-          type: 'number',
-          description: 'First number to sum',
+        category: {
+          type: 'string',
+          description: 'A word that describes what the budget is for',
         },
-        b: {
+        totalAmount: {
           type: 'number',
-          description: 'Second number to sum',
+          description:
+            'The amount of money to be set aside for each budget cycle',
+        },
+        startDate: {
+          type: 'string',
+          description: 'The day the budget cycle starts (format: YYYY-MM-DD)',
+        },
+        refreshCycle: {
+          type: 'string',
+          description: 'The duration of each budget cycle',
         },
       },
-      required: ['a', 'b'],
+      required: ['category', 'totalAmount', 'startDate', 'refreshCycle'],
     },
   });
 
   getTools() {
-    return { sumNumbers: this.sumNumbersTool };
+    return { createBudget: this.createBudgetTool };
   }
 }
