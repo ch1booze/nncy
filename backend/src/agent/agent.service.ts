@@ -1,4 +1,3 @@
-import cytoscape, { Core } from 'cytoscape';
 import { Groq, LLMAgent } from 'llamaindex';
 
 import { Injectable } from '@nestjs/common';
@@ -10,8 +9,8 @@ import { AgentNode, ChatDto } from './payload/agent.dto';
 @Injectable()
 export class AgentService {
   private llm: Groq;
-  private agentNodes;
-  private graph: Core;
+  private graph: { [key: string]: string[] } = {};
+  private agents: { [key: string]: LLMAgent } = {};
 
   constructor(
     private readonly configService: ConfigService,
@@ -32,5 +31,11 @@ export class AgentService {
     });
   }
 
-  async chat(chatDto: ChatDto) {}
+  async chat(chatDto: ChatDto) {
+    const result = await this.agents['systemAgent'].chat({
+      message: chatDto.message,
+    });
+
+    return ResponseDto.generateResponse(IntentIsGotten, result);
+  }
 }
