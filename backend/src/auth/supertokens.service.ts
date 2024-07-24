@@ -15,7 +15,27 @@ export class SupertokensService {
         connectionURI: config.connectionURI,
         apiKey: config.apiKey,
       },
-      recipeList: [EmailPassword.init(), Session.init()],
+      recipeList: [
+        EmailPassword.init(),
+        Session.init({
+          override: {
+            functions: (originalImplementation) => {
+              return {
+                ...originalImplementation,
+                createNewSession: async function (input) {
+                  let userId = input.userId;
+                  input.accessTokenPayload = {
+                    ...input.accessTokenPayload,
+                    someKey: 'someValue',
+                  };
+
+                  return originalImplementation.createNewSession(input);
+                },
+              };
+            },
+          },
+        }),
+      ],
     });
   }
 }
