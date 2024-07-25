@@ -1,3 +1,5 @@
+import { DatabaseModule } from 'src/database/database.module';
+
 import {
   DynamicModule,
   MiddlewareConsumer,
@@ -5,14 +7,16 @@ import {
   NestModule,
 } from '@nestjs/common';
 
+import { AuthController } from './auth.controller';
 import { AuthMiddleware } from './auth.middleware';
+import { AuthService } from './auth.service';
 import { AuthModuleConfig, ConfigInjectionToken } from './config.interface';
 import { SupertokensService } from './supertokens.service';
 
 @Module({
-  providers: [],
-  exports: [],
-  controllers: [],
+  imports: [DatabaseModule],
+  providers: [AuthService],
+  controllers: [AuthController],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

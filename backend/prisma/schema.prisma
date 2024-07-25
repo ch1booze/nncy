@@ -24,12 +24,11 @@ model User {
   dateOfBirth DateTime? @db.Date
 
   isEmailVerified Boolean @default(false)
-  isPhoneVerified Boolean @default(false)
   isBvnVerified   Boolean @default(false)
 
   accounts Account[]
   debts    Debit[]
-  Budget   Budget[]
+  budgets  Budget[]
 }
 
 // Account

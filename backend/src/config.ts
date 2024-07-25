@@ -8,7 +8,5 @@ export const appInfo = {
   apiBasePath: '/auth',
   websiteBasePath: '/auth',
 };
-
-export const connectionUri = 'https://try.supertokens.com';
-
+export const connectionUri = 'http://localhost:3567';
 export const recipeList = [EmailPassword.init(), Session.init()];
