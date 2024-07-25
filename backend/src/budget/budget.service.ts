@@ -3,7 +3,6 @@ import { toDecimal } from 'dinero.js';
 import { DateTime } from 'luxon';
 import { DatabaseService } from 'src/database/database.service';
 import { ResponseDto } from 'src/response/response.dto';
-import { UserDto } from 'src/user/payload/user.dto';
 
 import { Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
@@ -18,14 +17,14 @@ export class BudgetService {
     private schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  async createBudget(user: UserDto, createBudgetDto: CreateBudgetDto) {
+  async createBudget(userId: string, createBudgetDto: CreateBudgetDto) {
     const createdBudget = await this.databaseService.budget.create({
       data: {
         category: createBudgetDto.category,
         totalAmount: toDecimal(createBudgetDto.totalAmount),
         startDate: createBudgetDto.startDate,
         refreshCycle: createBudgetDto.refreshCycle,
-        userId: user.id,
+        userId,
       },
     });
     await this.startBudget(createdBudget.id, createdBudget.refreshCycle);

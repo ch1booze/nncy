@@ -1,23 +1,20 @@
-import { JwtAuthGuard } from 'src/user/jwt-auth.guard';
-import { UserDto } from 'src/user/payload/user.dto';
-import { User } from 'src/user/user.decorator';
-
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Session } from '@nestjs/common';
 
 import { BudgetService } from './budget.service';
 import { CreateBudgetPipe } from './create-budget.pipe';
 import { CreateBudgetDto } from './payload/budget.dto';
+import { SessionContainer } from 'supertokens-node/recipe/session';
 
 @Controller('budget')
-@UseGuards(JwtAuthGuard)
 export class BudgetController {
   constructor(private readonly budgetService: BudgetService) {}
 
   @Post('create-budget')
   async createBudget(
-    @User() user: UserDto,
+    @Session() session: SessionContainer,
     @Body(CreateBudgetPipe) createBudgetDto: CreateBudgetDto,
   ) {
-    return await this.budgetService.createBudget(user, createBudgetDto);
+    const userId = session.getUserId();
+    return await this.budgetService.createBudget(userId, createBudgetDto);
   }
 }

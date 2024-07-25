@@ -9,7 +9,7 @@ import {
 import { OtpNotValid } from 'src/messaging/payload/messaging.response';
 import { ObpService } from 'src/obp/obp.service';
 import { ResponseDto } from 'src/response/response.dto';
-import { TokenDto, UserDto } from 'src/user/payload/user.dto';
+import { TokenDto } from 'src/user/payload/user.dto';
 import { EmailNotVerified } from 'src/user/payload/user.response';
 
 import { Injectable } from '@nestjs/common';
@@ -44,9 +44,9 @@ export class BankingService {
     private obpService: ObpService,
   ) {}
 
-  async sendBvnVerification(user: UserDto, bvnDto: BvnDto) {
+  async sendBvnVerification(userId: string, bvnDto: BvnDto) {
     const foundUser = await this.databaseService.user.findUnique({
-      where: { id: user.id },
+      where: { id: userId },
     });
     if (!foundUser.isEmailVerified) {
       return ResponseDto.generateResponse(EmailNotVerified);
@@ -56,7 +56,7 @@ export class BankingService {
       await this.obpService.getPhoneLinkedToBvn(bvnDto);
     const otpDto: OtpDto = await this.messagingService.generateOtp();
     await this.databaseService.user.update({
-      where: { id: user.id },
+      where: { id: userId },
       data: { secret: otpDto.secret },
     });
 
@@ -70,9 +70,9 @@ export class BankingService {
     return await this.messagingService.sendSms(sendSmsDto);
   }
 
-  async verifyBvn(user: UserDto, tokenDto: TokenDto) {
+  async verifyBvn(userId: string, tokenDto: TokenDto) {
     const foundUser = await this.databaseService.user.findUnique({
-      where: { id: user.id },
+      where: { id: userId },
     });
 
     const otpDto: OtpDto = {
@@ -85,16 +85,16 @@ export class BankingService {
     }
 
     await this.databaseService.user.update({
-      where: { id: user.id },
+      where: { id: userId },
       data: { isBvnVerified: true },
     });
 
     return ResponseDto.generateResponse(BvnIsVerified);
   }
 
-  async getAccountsLinkedToBvn(user: UserDto) {
+  async getAccountsLinkedToBvn(userId: string) {
     const foundUser = await this.databaseService.user.findUnique({
-      where: { id: user.id },
+      where: { id: userId },
     });
     if (!foundUser.isBvnVerified) {
       return ResponseDto.generateResponse(BvnNotVerified);
@@ -110,9 +110,9 @@ export class BankingService {
     );
   }
 
-  async linkAccounts(user: UserDto, accountNumbers: AccountNumberDto[]) {
+  async linkAccounts(userId: string, accountNumbers: AccountNumberDto[]) {
     const foundUser = await this.databaseService.user.findUnique({
-      where: { id: user.id },
+      where: { id: userId },
     });
 
     const bvnDto: BvnDto = { bvn: foundUser.bvn };
@@ -126,7 +126,7 @@ export class BankingService {
       .map((account) => {
         return {
           ...account,
-          userId: user.id,
+          userId: userId,
         };
       });
 
@@ -139,11 +139,11 @@ export class BankingService {
   }
 
   async getAccountsBalances(
-    user: UserDto,
+    userId: string,
     accountNumberDtos: AccountNumberDto[],
   ) {
     const foundUser = await this.databaseService.user.findUnique({
-      where: { id: user.id },
+      where: { id: userId },
     });
     if (!foundUser.isBvnVerified) {
       return ResponseDto.generateResponse(BvnNotVerified);
@@ -164,12 +164,12 @@ export class BankingService {
     );
   }
 
-  async getAccountsSummary(user: UserDto) {
+  async getAccountsSummary(userId: string) {
     const AccountSummarySelectList = ['bankName', 'number', 'currencyCode'];
     const AccountSummarySelectFields =
       await this.databaseService.getSelectFields(AccountSummarySelectList);
     const foundAccounts = await this.databaseService.account.findMany({
-      where: { userId: user.id },
+      where: { userId: userId },
       select: AccountSummarySelectFields,
     });
 
@@ -179,9 +179,9 @@ export class BankingService {
     );
   }
 
-  async getAccountById(user: UserDto, index: number) {
+  async getAccountById(userId: string, index: number) {
     const foundAccount = await this.databaseService.account.findFirst({
-      where: { userId: user.id },
+      where: { userId: userId },
       skip: index,
       take: 1,
     });
@@ -190,18 +190,18 @@ export class BankingService {
   }
 
   async getTransactions(
-    user: UserDto,
+    userId: string,
     TransactionFilterDto: TransactionFilterDto,
   ) {
     const foundUser = await this.databaseService.user.findUnique({
-      where: { id: user.id },
+      where: { id: userId },
     });
     if (!foundUser.isBvnVerified) {
       return ResponseDto.generateResponse(BvnNotVerified);
     }
 
     const foundAccountNumbers = await this.databaseService.account.findMany({
-      where: { userId: user.id },
+      where: { userId: userId },
       select: { number: true },
     });
 
@@ -239,9 +239,9 @@ export class BankingService {
     );
   }
 
-  async transferFunds(user: UserDto, transferFundsDto: TransferFundsDto) {
+  async transferFunds(userId: string, transferFundsDto: TransferFundsDto) {
     const bvnDto: BvnDto = await this.databaseService.user.findUnique({
-      where: { id: user.id },
+      where: { id: userId },
       select: { bvn: true },
     });
     const primaryAccountNumberDto: AccountNumberDto = {
@@ -274,7 +274,7 @@ export class BankingService {
         transferBankCode: transferFundsDto.transferBankCode,
         amount: toDecimal(transferFundsDto.amount),
         balanceAfter: toDecimal(balanceAfter),
-        userId: user.id,
+        userId: userId,
         accountNumber: transferFundsDto.primaryAccountNumber,
       },
     });

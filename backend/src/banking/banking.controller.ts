@@ -1,6 +1,6 @@
-import { JwtAuthGuard } from 'src/user/jwt-auth.guard';
-import { TokenDto, UserDto } from 'src/user/payload/user.dto';
-import { User } from 'src/user/user.decorator';
+import { Session } from 'src/auth/session.decorator';
+import { TokenDto } from 'src/user/payload/user.dto';
+import { SessionContainer } from 'supertokens-node/recipe/session';
 
 import {
   Body,
@@ -10,7 +10,6 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 
 import { BankingService } from './banking.service';
@@ -23,61 +22,77 @@ import {
 import { TransferFundsPipe } from './transfer-funds.pipe';
 
 @Controller('banking')
-@UseGuards(JwtAuthGuard)
 export class BankingController {
   constructor(private readonly bankingService: BankingService) {}
 
   @Post('send-bvn-verification')
-  async sendBvnVerification(@User() user: UserDto, @Body() bvnDto: BvnDto) {
-    return await this.bankingService.sendBvnVerification(user, bvnDto);
+  async sendBvnVerification(
+    @Session() session: SessionContainer,
+    @Body() bvnDto: BvnDto,
+  ) {
+    const userId = session.getUserId();
+    return await this.bankingService.sendBvnVerification(userId, bvnDto);
   }
 
   @Post('verify-bvn')
-  async verifyBvn(@User() user: UserDto, @Body() tokenDto: TokenDto) {
-    return await this.bankingService.verifyBvn(user, tokenDto);
+  async verifyBvn(
+    @Session() session: SessionContainer,
+    @Body() tokenDto: TokenDto,
+  ) {
+    const userId = session.getUserId();
+    return await this.bankingService.verifyBvn(userId, tokenDto);
   }
 
   @Get('get-accounts-linked-to-bvn')
-  async getAccountsLinkedToBvn(@User() user: UserDto) {
-    return await this.bankingService.getAccountsLinkedToBvn(user);
+  async getAccountsLinkedToBvn(@Session() session: SessionContainer) {
+    const userId = session.getUserId();
+    return await this.bankingService.getAccountsLinkedToBvn(userId);
   }
 
   @Put('link-accounts')
   async linkAccounts(
-    @User() user: UserDto,
+    @Session() session: SessionContainer,
     @Body() accountNumbers: AccountNumberDto[],
   ) {
-    return await this.bankingService.linkAccounts(user, accountNumbers);
+    const userId = session.getUserId();
+    return await this.bankingService.linkAccounts(userId, accountNumbers);
   }
 
   @Get('get-accounts-summary')
-  async getAccountsSummary(@User() user: UserDto) {
-    return await this.bankingService.getAccountsSummary(user);
+  async getAccountsSummary(@Session() session: SessionContainer) {
+    const userId = session.getUserId();
+    return await this.bankingService.getAccountsSummary(userId);
   }
 
   @Get('get-account')
   async getAccountByIndex(
-    @User() user: UserDto,
+    @Session() session: SessionContainer,
     @Query('index', ParseIntPipe) index: number,
   ) {
-    return await this.bankingService.getAccountById(user, index);
+    const userId = session.getUserId();
+    return await this.bankingService.getAccountById(userId, index);
   }
 
   @Post('get-accounts-balances')
   async getAccountsBalances(
-    @User() user: UserDto,
+    @Session() session: SessionContainer,
     @Body() accountNumbers: AccountNumberDto[],
   ) {
-    return await this.bankingService.getAccountsBalances(user, accountNumbers);
+    const userId = session.getUserId();
+    return await this.bankingService.getAccountsBalances(
+      userId,
+      accountNumbers,
+    );
   }
 
   @Get('get-transactions')
   async getTransactions(
-    @User() user: UserDto,
+    @Session() session: SessionContainer,
     @Body() transactionFilterDto: TransactionFilterDto,
   ) {
+    const userId = session.getUserId();
     return await this.bankingService.getTransactions(
-      user,
+      userId,
       transactionFilterDto,
     );
   }
@@ -93,9 +108,10 @@ export class BankingController {
 
   @Post('transfer-funds')
   async transferFunds(
-    @User() user: UserDto,
+    @Session() session: SessionContainer,
     @Body(TransferFundsPipe) transferFundDto: TransferFundsDto,
   ) {
-    return await this.bankingService.transferFunds(user, transferFundDto);
+    const userId = session.getUserId();
+    return await this.bankingService.transferFunds(userId, transferFundDto);
   }
 }

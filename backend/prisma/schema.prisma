@@ -9,15 +9,14 @@ datasource db {
 
 // User
 model User {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id        String   @id @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email    String  @unique
-  phone    String? @db.Char(13)
-  bvn      String? @unique
-  secret   String?
-  password String
+  email  String  @unique
+  phone  String? @db.Char(13)
+  bvn    String? @unique
+  secret String?
 
   firstName   String
   lastName    String

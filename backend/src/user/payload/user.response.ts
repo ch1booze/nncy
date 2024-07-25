@@ -42,21 +42,6 @@ export const UserProfileIsRetrieved: ResponseObject = {
   message: 'User profile is retrieved',
 };
 
-export const IncorrectPassword: ResponseObject = {
-  status: HttpStatus.BAD_REQUEST,
-  message: 'Incorrect password',
-};
-
-export const PasswordIsReset: ResponseObject = {
-  status: HttpStatus.OK,
-  message: 'Password is reset',
-};
-
-export const PasswordNotReset: ResponseObject = {
-  status: HttpStatus.BAD_REQUEST,
-  message: 'Password not reset',
-};
-
 export const TokenNotFound: ResponseObject = {
   status: HttpStatus.BAD_REQUEST,
   message: 'Token not found',

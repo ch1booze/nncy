@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsNumberString,
   IsString,
-  IsStrongPassword,
   Length,
 } from 'class-validator';
 
@@ -21,11 +20,6 @@ export class SignupDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsStrongPassword()
-  password: string;
 }
 
 export class LoginDto {
@@ -55,20 +49,4 @@ export class TokenDto {
   @IsNotEmpty()
   @Length(tokenLength)
   token: string;
-}
-
-export class ResetPasswordDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsNumberString()
-  @IsNotEmpty()
-  @Length(tokenLength)
-  token: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsStrongPassword()
-  password: string;
 }

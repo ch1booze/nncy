@@ -14,7 +14,7 @@ import { DatabaseModule } from './database/database.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { ObpModule } from './obp/obp.module';
 import { ResponseInterceptor } from './response/response.interceptor';
-// import { UserModule } from './user/user.module';
+import { UserModule } from './user/user.module';
 import { HttpExceptionFilter } from './utils/http-exception.filter';
 
 @Module({
@@ -34,7 +34,7 @@ import { HttpExceptionFilter } from './utils/http-exception.filter';
     MessagingModule,
     ObpModule,
     ScheduleModule.forRoot(),
-    // UserModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [
