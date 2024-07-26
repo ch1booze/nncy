@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 
 import { BankingService } from './banking.service';
@@ -20,8 +21,10 @@ import {
   TransferFundsDto,
 } from './payload/banking.dto';
 import { TransferFundsPipe } from './transfer-funds.pipe';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('banking')
+@UseGuards(new AuthGuard())
 export class BankingController {
   constructor(private readonly bankingService: BankingService) {}
 

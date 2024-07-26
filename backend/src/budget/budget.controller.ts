@@ -1,11 +1,14 @@
-import { Body, Controller, Post, Session } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { SessionContainer } from 'supertokens-node/recipe/session';
+
+import { Body, Controller, Post, Session, UseGuards } from '@nestjs/common';
 
 import { BudgetService } from './budget.service';
 import { CreateBudgetPipe } from './create-budget.pipe';
 import { CreateBudgetDto } from './payload/budget.dto';
-import { SessionContainer } from 'supertokens-node/recipe/session';
 
 @Controller('budget')
+@UseGuards(new AuthGuard())
 export class BudgetController {
   constructor(private readonly budgetService: BudgetService) {}
 
