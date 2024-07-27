@@ -37,18 +37,6 @@ export class LoginDto {
   password: string;
 }
 
-export class UserDto {
-  @IsString()
-  @IsNotEmpty()
-  id: string;
-}
-
-export class EmailDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-}
-
 export class TokenDto {
   @IsNumberString()
   @IsNotEmpty()

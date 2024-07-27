@@ -14,12 +14,14 @@ import { SessionContainer } from 'supertokens-node/recipe/session';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 
-import { SignupDto, TokenDto } from './payload/user.dto';
+import { LoginDto, SignupDto, TokenDto } from './payload/user.dto';
 import {
   ClaimsIsSet,
   EmailIsVerified,
   UserAlreadyExists,
+  UserIsAuthorized,
   UserIsCreated,
+  UserNotAuthorized,
   UserProfileIsRetrieved,
 } from './payload/user.response';
 
@@ -72,6 +74,44 @@ export class UserService {
       );
     } else {
       return ResponseDto.generateResponse(UserAlreadyExists);
+    }
+  }
+
+  async login(loginDto: LoginDto) {
+    const formFields = {
+      formFields: [
+        { id: 'email', value: loginDto.email },
+        { id: 'password', value: loginDto.password },
+      ],
+    };
+
+    const loginResponse = await this.httpService.axiosRef
+      .post('http://localhost:3001/auth/signin', formFields, {
+        headers: {
+          'Content-Type': 'application/json',
+          rid: 'emailpassword',
+        },
+      })
+      .then((response) => {
+        const headers = response.headers;
+        const data = response.data;
+        return { data, headers };
+      });
+
+    if (loginResponse.data.status === 'OK') {
+      const cookies = {
+        sAccessToken: loginResponse.headers['st-access-token'],
+        sRefreshToken: loginResponse.headers['st-refresh-token'],
+      };
+
+      return ResponseDto.generateResponse(
+        UserIsAuthorized,
+        loginResponse.data,
+        loginResponse.headers,
+        cookies,
+      );
+    } else {
+      return ResponseDto.generateResponse(UserNotAuthorized);
     }
   }
 

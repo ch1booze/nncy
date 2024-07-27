@@ -1,11 +1,11 @@
+import { AuthGuard } from 'src/auth/auth.guard';
 import { Session } from 'src/auth/session.decorator';
 import { SessionContainer } from 'supertokens-node/recipe/session';
 
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 
-import { SignupDto, TokenDto } from './payload/user.dto';
+import { LoginDto, SignupDto, TokenDto } from './payload/user.dto';
 import { UserService } from './user.service';
-import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -14,6 +14,11 @@ export class UserController {
   @Post('signup')
   async signup(@Body() signupDto: SignupDto) {
     return await this.userService.signup(signupDto);
+  }
+
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    return await this.userService.login(loginDto);
   }
 
   @Get('get-claims')
