@@ -10,20 +10,28 @@ export class ResponseDto<T> {
   message: string;
   data?: T;
   headers?: object;
+  cookies?: object;
 
-  constructor(responseObject: ResponseObject, data?: T, headers?: object) {
+  constructor(
+    responseObject: ResponseObject,
+    data?: T,
+    headers?: object,
+    cookies?: object,
+  ) {
     const { status, message } = responseObject;
     this.status = status;
     this.message = message;
     this.data = data;
-    this.headers = headers ?? {};
+    this.headers = headers;
+    this.cookies = cookies;
   }
 
   static generateResponse<T>(
     responseObject: ResponseObject,
     data?: T,
     headers?: object,
+    cookies?: object,
   ): ResponseDto<T> {
-    return new ResponseDto(responseObject, data, headers);
+    return new ResponseDto(responseObject, data, headers, cookies);
   }
 }

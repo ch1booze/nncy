@@ -1,4 +1,5 @@
 import supertokens from 'supertokens-node';
+import Dashboard from 'supertokens-node/recipe/dashboard';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import Session from 'supertokens-node/recipe/session';
 
@@ -19,7 +20,7 @@ export class SupertokensService {
         connectionURI: this.config.connectionURI,
         apiKey: this.config.apiKey,
       },
-      recipeList: [EmailPassword.init(), Session.init()],
+      recipeList: [EmailPassword.init(), Session.init(), Dashboard.init()],
     });
   }
 }

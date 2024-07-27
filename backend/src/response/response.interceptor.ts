@@ -13,9 +13,14 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((responseDto) => {
         const response = context.switchToHttp().getResponse();
-        const { status, headers, ...responseBody } = responseDto;
+        const { status, headers, cookies, ...responseBody } = responseDto;
         response.set(headers);
         response.status(status);
+        if (cookies) {
+          for (const [key, value] of Object.entries(cookies)) {
+            response.cookie(key, value);
+          }
+        }
         return responseBody;
       }),
     );

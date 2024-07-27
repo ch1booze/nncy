@@ -60,10 +60,15 @@ export class UserService {
         lastName: signupDto.lastName,
       };
       await this.databaseService.user.create({ data: userData });
+      const cookies = {
+        sAccessToken: signupResponse.headers['st-access-token'],
+        sRefreshToken: signupResponse.headers['st-refresh-token'],
+      };
       return ResponseDto.generateResponse(
         UserIsCreated,
         signupResponse.data,
         signupResponse.headers,
+        cookies,
       );
     } else {
       return ResponseDto.generateResponse(UserAlreadyExists);
