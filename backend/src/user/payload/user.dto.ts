@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsNumberString,
   IsString,
+  IsStrongPassword,
   Length,
 } from 'class-validator';
 
@@ -20,6 +21,10 @@ export class SignupDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @IsStrongPassword()
+  @IsNotEmpty()
+  password: string;
 }
 
 export class LoginDto {

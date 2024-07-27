@@ -8,26 +8,28 @@ import { UserService } from './user.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('user')
-@UseGuards(new AuthGuard())
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('signup')
-  async signup(
-    @Session() session: SessionContainer,
-    @Body() signupDto: SignupDto,
-  ) {
-    const userId = session.getUserId();
-    return await this.userService.signup(userId, signupDto);
+  async signup(@Body() signupDto: SignupDto) {
+    return await this.userService.signup(signupDto);
+  }
+
+  @Get('get-claims')
+  async getClaims(@Session() session: SessionContainer) {
+    return await this.userService.getClaims(session);
   }
 
   @Get('get-profile')
+  @UseGuards(new AuthGuard())
   async getProfile(@Session() session: SessionContainer) {
     const userId = session.getUserId();
     return await this.userService.getProfile(userId);
   }
 
   @Get('send-verification-email')
+  @UseGuards(new AuthGuard())
   async sendVerificationEmail(@Session() session: SessionContainer) {
     const userId = session.getUserId();
     return await this.userService.sendVerificationEmail(userId);

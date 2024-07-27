@@ -9,12 +9,16 @@ import { OtpNotValid } from 'src/messaging/payload/messaging.response';
 import { ResponseDto } from 'src/response/response.dto';
 import supertokens from 'supertokens-node';
 import EmailVerification from 'supertokens-node/recipe/emailverification';
+import { SessionContainer } from 'supertokens-node/recipe/session';
 
+import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 
 import { SignupDto, TokenDto } from './payload/user.dto';
 import {
+  ClaimsIsSet,
   EmailIsVerified,
+  UserAlreadyExists,
   UserIsCreated,
   UserProfileIsRetrieved,
 } from './payload/user.response';
@@ -23,15 +27,60 @@ import {
 export class UserService {
   constructor(
     private databaseService: DatabaseService,
+    private httpService: HttpService,
     private messagingService: MessagingService,
   ) {}
 
-  async signup(userId: string, signupDto: SignupDto) {
-    await this.databaseService.user.create({
-      data: { id: userId, ...signupDto },
+  async signup(signupDto: SignupDto) {
+    const formFields = {
+      formFields: [
+        { id: 'email', value: signupDto.email },
+        { id: 'password', value: signupDto.password },
+      ],
+    };
+
+    const signupResponse = await this.httpService.axiosRef
+      .post('http://localhost:3001/auth/signup', formFields, {
+        headers: {
+          'Content-Type': 'application/json',
+          rid: 'emailpassword',
+        },
+      })
+      .then((response) => {
+        const headers = response.headers;
+        const data = response.data;
+        return { data, headers };
+      });
+
+    if (signupResponse.data.status === 'OK') {
+      const userData = {
+        id: signupResponse.data.user.id,
+        email: signupDto.email,
+        firstName: signupDto.firstName,
+        lastName: signupDto.lastName,
+      };
+      await this.databaseService.user.create({ data: userData });
+      return ResponseDto.generateResponse(
+        UserIsCreated,
+        signupResponse.data,
+        signupResponse.headers,
+      );
+    } else {
+      return ResponseDto.generateResponse(UserAlreadyExists);
+    }
+  }
+
+  async getClaims(session: SessionContainer) {
+    const userId = session.getUserId();
+    const foundUser = await this.databaseService.user.findUnique({
+      where: { id: userId },
+    });
+    session.mergeIntoAccessTokenPayload({
+      isBvnVerified: foundUser.isBvnVerified,
     });
 
-    return ResponseDto.generateResponse(UserIsCreated);
+    console.log(await this.databaseService.user.fields);
+    return ResponseDto.generateResponse(ClaimsIsSet);
   }
 
   async getProfile(userId: string) {

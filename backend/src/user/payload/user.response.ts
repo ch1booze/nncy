@@ -46,3 +46,8 @@ export const TokenNotFound: ResponseObject = {
   status: HttpStatus.BAD_REQUEST,
   message: 'Token not found',
 };
+
+export const ClaimsIsSet: ResponseObject = {
+  status: HttpStatus.OK,
+  message: 'Claims is set',
+};

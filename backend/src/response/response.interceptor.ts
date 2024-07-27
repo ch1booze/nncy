@@ -13,7 +13,8 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((responseDto) => {
         const response = context.switchToHttp().getResponse();
-        const { status, ...responseBody } = responseDto;
+        const { status, headers, ...responseBody } = responseDto;
+        response.set(headers);
         response.status(status);
         return responseBody;
       }),
